@@ -10,9 +10,7 @@
     <style id="m3-tokens">
         :root {
             --md-sys-color-primary: #6750A4;
-            --md-sys-color-on-primary: #FFFFFF;
             --md-sys-color-surface: #FEF7FF;
-            --md-sys-color-on-surface: #1D1B20;
             --md-sys-color-surface-container-low: #F7F2FA;
             --md-sys-color-surface-container-highest: #E6E0E9;
             --md-sys-color-outline-variant: #CAC4D0;
@@ -22,70 +20,105 @@
     
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Google Sans', sans-serif; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+        body { font-family: 'Google Sans', sans-serif; background: var(--md-sys-color-surface); color: #1D1B20; }
         .header { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--md-sys-color-surface); z-index: 1000; }
-        .logo-img { width: 44px; height: 44px; border-radius: 12px; }
+        
+        /* Promo Section */
+        .promo-banner { margin: 16px; padding: 20px; background: var(--md-sys-color-primary); color: white; border-radius: 28px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 12px rgba(103, 80, 164, 0.2); }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; padding: 16px; padding-bottom: 120px; }
         .card { background: var(--md-sys-color-surface-container-low); border-radius: 28px; padding: 12px; border: 1px solid var(--md-sys-color-outline-variant); text-align: center; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 22px; object-fit: cover; }
+        
         .sheet { position: fixed; inset: 0; z-index: 5000; transform: translateY(115%); background: var(--md-sys-color-surface-container-highest); border-radius: 32px 32px 0 0; transition: transform 0.4s var(--spring); display: flex; flex-direction: column; }
         .sheet.active { transform: translateY(0); }
         #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 4500; opacity: 0; pointer-events: none; backdrop-filter: blur(8px); transition: opacity 0.3s; }
         #scrim.active { opacity: 1; pointer-events: auto; }
-        .btn-fab { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; height: 64px; background: var(--md-sys-color-primary); color: white; border-radius: 24px; border: none; font-weight: 700; z-index: 1001; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        
+        .btn-fab { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; height: 64px; background: var(--md-sys-color-primary); color: white; border-radius: 24px; border: none; font-weight: 700; z-index: 1001; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .badge { background: #B3261E; color: white; min-width: 20px; height: 20px; border-radius: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
     </style>
 </head>
 <body>
-    <div id="scrim" onclick="UI.close()"></div>
+    <div id="scrim" onclick="MODULE_UI.closeAll()"></div>
 
     <header class="header">
-        <button style="background:none; border:none;" onclick="UI.toggle('menu', true)"><span class="material-symbols-rounded" style="font-size:32px;">menu</span></button>
-        <img src="Logo.jpg" class="logo-img" onerror="this.src='https://placehold.co/44'">
+        <button style="background:none; border:none;" onclick="MODULE_UI.toggle('menu', true)"><span class="material-symbols-rounded" style="font-size:32px;">menu</span></button>
+        <img src="Logo.jpg" style="width:44px; height:44px; border-radius:12px;" onerror="this.src='https://placehold.co/44'">
         <div style="width:32px;"></div>
     </header>
 
-    <div id="menu-sheet" class="sheet" style="width:300px; height:100%; border-radius:0 32px 32px 0; transform:translateX(-100%); left:0; right:auto;">
-       <div style="padding: 24px;">
-           <h2 style="margin-bottom:20px;">Otaku Beads</h2>
-           <button class="card" style="width:100%; padding:16px; margin-bottom:12px; cursor:pointer;" onclick="UI.toggle('paxi', true)">PAXI Info</button>
-       </div>
+    <div class="promo-banner">
+        <span class="material-symbols-rounded" style="font-size:40px;">celebration</span>
+        <div>
+            <h3 style="font-size: 18px;">Buy 2 Get 1 FREE!</h3>
+            <p style="font-size: 14px; opacity: 0.9;">Add any 3 to your bag to apply.</p>
+        </div>
     </div>
 
     <main class="grid" id="main-grid"></main>
 
-    <button class="btn-fab" onclick="UI.toggle('bag', true)">
-        <span class="material-symbols-rounded">shopping_bag</span> View My Bag
+    <button class="btn-fab" onclick="MODULE_UI.toggle('bag', true)">
+        <span class="material-symbols-rounded">shopping_bag</span> 
+        View Bag <div id="badge-count" class="badge" style="display:none;">0</div>
     </button>
 
     <div id="bag-sheet" class="sheet">
-        <div style="padding: 24px; display:flex; justify-content:space-between;">
+        <div style="padding: 24px; display:flex; justify-content:space-between; align-items:center;">
             <h2 style="font-weight:700;">Your Bag</h2>
-            <button onclick="UI.close()" style="background:none; border:none;"><span class="material-symbols-rounded">close</span></button>
+            <button onclick="MODULE_UI.closeAll()" style="background:none; border:none;"><span class="material-symbols-rounded">close</span></button>
         </div>
-        <div id="bag-items" style="flex:1; padding:0 24px;"></div>
-    </div>
-
-    <div id="paxi-sheet" class="sheet" style="height:50%; top:auto;">
-        <div style="padding: 24px;">
-            <h3>PAXI Guide</h3>
-            <p style="margin:16px 0; opacity:0.8;">Standard (R60) or Express (R100) available.</p>
-            <button class="btn-fab" style="position:static; transform:none; width:100%;" onclick="UI.close()">Got it!</button>
+        <div id="bag-items" style="flex:1; overflow-y:auto; padding:0 24px;"></div>
+        <div style="padding:24px; background:var(--md-sys-color-surface-container-high); border-radius:32px 32px 0 0;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <span>Total</span>
+                <span id="bag-total" style="font-size: 20px; font-weight: 700;">R 0.00</span>
+            </div>
+            <button class="btn-fab" style="position:static; transform:none; width:100%;" onclick="MODULE_CORE.checkout()">WhatsApp Order</button>
         </div>
     </div>
 
     <script>
-        const UI = {
+        const MODULE_CORE = {
+            cart: [],
+            add(id) {
+                this.cart.push(id);
+                this.updateUI();
+            },
+            updateUI() {
+                const count = this.cart.length;
+                const badge = document.getElementById('badge-count');
+                badge.innerText = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+                
+                // Logic for "Buy 2 Get 1 Free"
+                let total = this.cart.reduce((s, id) => s + (id <= 2 ? 45 : 65), 0);
+                if(this.cart.length >= 3) { total -= 45; } // Example promo math
+                
+                document.getElementById('bag-total').innerText = `R ${total}.00`;
+                this.renderBag();
+            },
+            renderBag() {
+                const list = document.getElementById('bag-items');
+                if (this.cart.length === 0) { list.innerHTML = '<p style="text-align:center; padding:40px; opacity:0.5;">Empty</p>'; return; }
+                const counts = this.cart.reduce((a,c)=>{ a[c]=(a[c]||0)+1; return a; }, {});
+                list.innerHTML = Object.keys(counts).map(id => `
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:12px; background:var(--md-sys-color-surface-container-low); padding:12px; border-radius:16px;">
+                    <img src="${id}.jpg" style="width:50px; height:50px; border-radius:8px;" onerror="this.src='Logo.jpg'">
+                    <div style="flex:1;"><div style="font-weight:700;">Design #${id}</div></div>
+                    <div>x${counts[id]}</div>
+                </div>`).join('');
+            },
+            checkout() { /* WhatsApp Logic */ }
+        };
+
+        const MODULE_UI = {
             toggle(id, s) {
-                const el = document.getElementById(id + '-sheet');
-                if(id === 'menu') { el.style.transform = s ? "translateX(0)" : "translateX(-100%)"; }
-                else { el.classList.toggle('active', s); }
+                document.getElementById(id + '-sheet').classList.toggle('active', s);
                 document.getElementById('scrim').classList.toggle('active', s);
             },
-            close() {
-                document.querySelectorAll('.sheet').forEach(s => {
-                    s.classList.remove('active');
-                    if(s.id === 'menu-sheet') s.style.transform = "translateX(-100%)";
-                });
+            closeAll() {
+                document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
                 document.getElementById('scrim').classList.remove('active');
             }
         };
@@ -94,11 +127,19 @@
             const grid = document.getElementById('main-grid');
             let h = "";
             for(let i=1; i<=28; i++) {
-                h += `<div class="card">
-                    <img src="${i}.jpg" onerror="this.src='Logo.jpg'">
-                    <div style="font-weight:700; margin:10px 0;">Design #${i}</div>
-                    <button style="width:100%; height:40px; border-radius:20px; border:none; background:var(--md-sys-color-primary); color:white;">Add</button>
-                </div>`;
+                if(i === 26) { // Placeholder for Design #26
+                    h += `<div class="card" style="opacity:0.5; filter:grayscale(1);">
+                        <img src="26.jpg" onerror="this.src='Logo.jpg'">
+                        <div style="font-weight:700; margin:10px 0;">Design #26</div>
+                        <button disabled style="width:100%; height:40px; border-radius:20px; border:none;">Coming Soon</button>
+                    </div>`;
+                } else {
+                    h += `<div class="card">
+                        <img src="${i}.jpg" onerror="this.src='Logo.jpg'">
+                        <div style="font-weight:700; margin:10px 0;">Design #${i}</div>
+                        <button style="width:100%; height:40px; border-radius:20px; border:none; background:var(--md-sys-color-primary); color:white; cursor:pointer;" onclick="MODULE_CORE.add(${i})">Add</button>
+                    </div>`;
+                }
             }
             grid.innerHTML = h;
         }
