@@ -10,41 +10,56 @@
     <style>
         :root { --p: #6750A4; --s: #FEF7FF; --c: #F3EDF7; --bez: cubic-bezier(0.3, 0, 0, 1); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Google Sans', sans-serif; background: var(--s); color: #1D1B20; }
-        header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; background: rgba(254,247,255,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        body { font-family: 'Google Sans', sans-serif; background: var(--s); color: #1D1B20; -webkit-font-smoothing: antialiased; }
+        
+        header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; background: rgba(254,247,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; padding-bottom: 120px; }
-        .card { background: var(--c); border-radius: 28px; padding: 12px; transition: 0.3s var(--bez); }
-        .card img { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; }
+        .card { background: var(--c); border-radius: 28px; padding: 12px; transition: transform 0.2s var(--bez); }
+        .card img { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; background: #fff; }
+        
         .btn-fill { background: var(--p); color: white; border: none; height: 52px; border-radius: 16px; font-weight: 700; width: 100%; cursor: pointer; }
         .btn-fill:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
-        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: var(--s); transition: 0.5s var(--bez); border-radius: 32px 32px 0 0; padding: 24px; }
+        
+        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: var(--s); transition: 0.5s var(--bez); border-radius: 32px 32px 0 0; padding: 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
         #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9000; display: none; backdrop-filter: blur(8px); }
     </style>
 </head>
 <body>
     <div id="scrim" onclick="CORE.UI.close()"></div>
+    
     <header>
-        <button onclick="CORE.UI.open('menu')" style="background:none; border:none;"><span class="material-symbols-rounded">menu</span></button>
+        <button onclick="CORE.UI.open('menu')" style="background:none; border:none; cursor:pointer;"><span class="material-symbols-rounded">menu</span></button>
         <div style="display:flex; align-items:center; gap:8px;"><img src="Logo.jpg" style="height:32px; border-radius:6px;"><b>Otaku Beads</b></div>
-        <div id="user-display" onclick="CORE.UI.open('auth')"><span class="material-symbols-rounded" style="font-size:32px; color:var(--p);">account_circle</span></div>
+        <div id="user-display" onclick="CORE.UI.open('auth')" style="cursor:pointer;"><span class="material-symbols-rounded" style="font-size:32px; color:var(--p);">account_circle</span></div>
     </header>
+
     <main class="grid" id="main-grid"></main>
+
     <div id="paxi-sheet" class="sheet">
         <h2 style="margin-bottom:12px;">Checkout</h2>
-        <div id="offer-text" style="display:none; color:var(--p); font-weight:700; margin-bottom:10px;">PROMO: 3rd Item Free!</div>
-        <p id="bag-count" style="margin-bottom:24px;">Bag: 0 items</p>
-        <button class="btn-fill" style="margin-bottom:12px;">Standard Paxi (R60)</button>
-        <button class="btn-fill" style="background:#ECE6F0; color:black;">Express Paxi (R100)</button>
+        <div id="promo-offer" style="display:none; color:var(--p); font-weight:700; margin-bottom:10px; background:#EADDFF; padding:8px; border-radius:12px; text-align:center;">BUY 2 GET 1 FREE APPLIED</div>
+        <p id="bag-status" style="margin-bottom:24px;">Items in bag: 0</p>
+        <button class="btn-fill" style="margin-bottom:12px;" onclick="alert('Standard Delivery Selected')">Standard Paxi (R60)</button>
+        <button class="btn-fill" style="background:#ECE6F0; color:black;" onclick="alert('Express Delivery Selected')">Express Paxi (R100)</button>
     </div>
-    <div id="auth-sheet" class="sheet"><div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onSignIn"></div><div class="g_id_signin" data-type="standard"></div></div>
+
+    <div id="auth-sheet" class="sheet">
+        <h2 style="text-align:center; margin-bottom:24px;">Sign In</h2>
+        <div id="g_id_onload" 
+             data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" 
+             data-callback="onSignIn">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline"></div>
+    </div>
+
     <script>
         const CORE = {
             bag: [],
             LOGIC: {
                 update() {
                     const c = CORE.bag.length;
-                    document.getElementById('bag-count').innerText = `Bag: ${c} items`;
-                    document.getElementById('offer-text').style.display = (c >= 3) ? 'block' : 'none';
+                    document.getElementById('bag-status').innerText = `Items in bag: ${c}`;
+                    document.getElementById('promo-offer').style.display = (c >= 3) ? 'block' : 'none';
                 }
             },
             UI: {
@@ -60,8 +75,21 @@
                 }
             }
         };
-        function onSignIn(r) { localStorage.setItem('ob_user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
-        window.onload = () => CORE.UI.render();
+
+        function onSignIn(response) {
+            const user = JSON.parse(atob(response.credential.split('.')[1]));
+            localStorage.setItem('ob_auth', JSON.stringify(user));
+            location.reload();
+        }
+
+        window.onload = () => {
+            const auth = localStorage.getItem('ob_auth');
+            if(auth) {
+                const u = JSON.parse(auth);
+                document.getElementById('user-display').innerHTML = `<img src="${u.picture}" style="width:32px; height:32px; border-radius:50%; border: 2px solid var(--p);">`;
+            }
+            CORE.UI.render();
+        };
     </script>
 </body>
 </html>
