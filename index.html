@@ -3,32 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V230 Powerhouse</title>
+    <title>Otaku Beads | V231</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
-        
         header { position: sticky; top: 0; background: rgba(15,13,19,0.85); backdrop-filter: blur(20px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 5000; border-bottom: 1px solid var(--out); }
-        #user-chip { background: var(--card); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; color: var(--prim); border: 1px solid var(--out); display: none; }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid var(--out); display: flex; flex-direction: column; min-height: 280px; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #222; }
         
-        /* COMING SOON [cite: 2026-01-31] */
-        .coming-soon { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+        /* CRAMP-FREE GRID [cite: 2026-01-29] */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px; }
+        .card { 
+            background: var(--card); 
+            border-radius: 28px; 
+            overflow: hidden; 
+            border: 1px solid var(--out); 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 320px; /* Added height to prevent cramped buttons */
+        }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #222; }
+        .card-content { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .design-name { font-weight: 700; font-size: 13px; margin-bottom: 10px; opacity: 0.9; }
 
-        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
+        /* BUTTONS & BAG [cite: 2026-01-29] */
+        .btn-m3 { height: 46px; border-radius: 23px; border: none; font-weight: 700; width: 100%; background: var(--prim); color: var(--on-prim); cursor: pointer; font-size: 14px; }
+        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
         .sheet { position: fixed; inset: 0; z-index: 10000; transform: translateY(100%); background: var(--bg); transition: 0.5s cubic-bezier(0.1, 0.7, 0.1, 1); border-radius: 32px 32px 0 0; padding: 24px; overflow-y: auto; }
         .sheet.full { transform: translateY(0); }
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; width: 100%; background: var(--prim); color: var(--on-prim); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        
-        .cart-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--out); }
-        .cart-row img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
-        .stepper { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 14px; padding: 4px 10px; border: 1px solid var(--out); }
     </style>
 </head>
 <body>
@@ -37,10 +40,7 @@
             <img src="logo.jpg" style="width:32px; height:32px; border-radius:8px;">
             <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
         </div>
-        <div style="display:flex; align-items:center; gap:12px;">
-            <div id="user-chip"></div>
-            <span class="material-symbols-rounded" onclick="UI.open('auth')" style="color:var(--prim); cursor:pointer; font-size:28px;">account_circle</span>
-        </div>
+        <span class="material-symbols-rounded" onclick="UI.open('auth')" style="color:var(--prim); cursor:pointer; font-size:28px;">account_circle</span>
     </header>
 
     <main id="store-grid" class="grid"></main>
@@ -50,41 +50,21 @@
         <span id="bag-count">R0</span>
     </button>
 
-    <div id="auth-sheet" class="sheet">
-        <div style="display:flex; justify-content:space-between; margin-bottom:40px;">
-            <h2>Account</h2>
-            <span class="material-symbols-rounded" onclick="UI.close()" style="cursor:pointer">close</span>
-        </div>
-        <div id="g-login-box" style="display:flex; justify-content:center;">
-            <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="handleAuth" data-auto_prompt="true"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="pill"></div>
-        </div>
-        <div id="g-profile-box" style="display:none; text-align:center;">
-            <h3 id="profile-name"></h3>
-            <button class="btn-m3" style="background:#444; color:white; margin-top:30px;" onclick="location.reload()">Sign Out</button>
-        </div>
-    </div>
-
     <div id="cart-sheet" class="sheet">
         <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
             <h2>Your Bag</h2>
-            <span class="material-symbols-rounded" onclick="UI.close()" style="cursor:pointer">close</span>
+            <span class="material-symbols-rounded" onclick="UI.close()">close</span>
         </div>
         <div id="cart-list"></div>
-        <div style="background:var(--card); padding:20px; border-radius:24px; border:1px solid var(--out); margin: 24px 0;">
-            <p style="margin:0 0 10px 0; font-weight:700;">Delivery [Paxi Section #X]</p>
-            <select id="paxi-sel" onchange="ENGINE.update()" style="width:100%; padding:14px; border-radius:14px; background:var(--bg); color:white; border:1px solid var(--out);">
-                <option value="60">Standard - R60</option>
-                <option value="100">Express - R100</option>
-            </select>
-        </div>
-        <button class="btn-m3" onclick="ENGINE.checkout()">WhatsApp Order</button>
+        <button class="btn-m3" style="margin-top:20px;" onclick="ENGINE.checkout()">WhatsApp Order</button>
     </div>
+
+    <div id="auth-sheet" class="sheet">...</div>
 
     <script>
         const UI = {
-            open(id) { if(id==='cart') ENGINE.sync(); document.getElementById(id+'-sheet').classList.add('full'); document.body.style.overflow='hidden'; },
-            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); document.body.style.overflow='auto'; }
+            open(id) { document.getElementById(id+'-sheet').classList.add('full'); },
+            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); }
         };
 
         const ENGINE = {
@@ -97,56 +77,34 @@
             render() {
                 document.getElementById('store-grid').innerHTML = this.db.map(n => {
                     const isSoon = n.includes('26');
-                    const p = n.includes('Keychain') ? 50 : 40;
+                    // CATEGORY PRICING PILLAR [cite: 2026-01-29]
+                    const price = n.toLowerCase().includes('keychain') ? 50 : 40;
                     return `
                     <div class="card ${isSoon ? 'coming-soon' : ''}">
                         <img src="${n}.jpg" onerror="this.src='coming soon1.jpeg'">
                         <div class="card-content">
-                            <div style="font-weight:700; font-size:14px;">Design ${n.replace('.jpg','')}</div>
-                            <button class="btn-m3" ${isSoon ? 'disabled' : ''} onclick="ENGINE.add('${n}',${p})">
-                                ${isSoon ? 'Coming Soon' : 'Add - R'+p}
+                            <div class="design-name">Design ${n.replace('.jpg','')}</div>
+                            <button class="btn-m3" ${isSoon ? 'disabled' : ''} onclick="ENGINE.add('${n}',${price})">
+                                ${isSoon ? 'Coming Soon' : 'Add - R' + price}
                             </button>
                         </div>
                     </div>`;
                 }).join('');
             },
-            add(n, p) { this.bag[n] = (this.bag[n] || 0) + 1; this.update(); },
-            updateQty(n, d) { this.bag[n]+=d; if(this.bag[n]<=0) delete this.bag[n]; this.sync(); this.update(); },
-            update() {
+            add(n, p) {
+                this.bag[n] = (this.bag[n] || 0) + 1;
+                this.updateTotal();
+            },
+            updateTotal() {
                 let sub = 0;
-                Object.keys(this.bag).forEach(k => sub += (k.includes('Keychain')?50:40) * this.bag[k]);
+                Object.keys(this.bag).forEach(k => {
+                    const p = k.toLowerCase().includes('keychain') ? 50 : 40;
+                    sub += p * this.bag[k];
+                });
                 document.getElementById('bag-count').innerText = 'R' + sub;
             },
-            sync() {
-                const list = document.getElementById('cart-list');
-                const keys = Object.keys(this.bag);
-                list.innerHTML = keys.length ? keys.map(k => `
-                    <div class="cart-row">
-                        <img src="${k}.jpg" onerror="this.src='coming soon1.jpeg'">
-                        <div style="flex:1">Design ${k}</div>
-                        <div class="stepper">
-                            <span class="material-symbols-rounded" style="cursor:pointer" onclick="ENGINE.updateQty('${k}',-1)">remove</span>
-                            <b>${this.bag[k]}</b>
-                            <span class="material-symbols-rounded" style="cursor:pointer" onclick="ENGINE.updateQty('${k}',1)">add</span>
-                        </div>
-                    </div>`).join('') : "<p style='text-align:center; opacity:0.5; padding:40px 0;'>Bag is empty.</p>";
-            },
-            checkout() {
-                const items = Object.keys(this.bag).map(k => `${k} x${this.bag[k]}`).join(', ');
-                const paxi = document.getElementById('paxi-sel').options[document.getElementById('paxi-sel').selectedIndex].text;
-                window.open(`https://wa.me/27123456789?text=Order: ${items} | ${paxi}`, '_blank');
-            }
+            checkout() { window.open('https://wa.me/27123456789?text=Order', '_blank'); }
         };
-
-        function handleAuth(r) {
-            const user = JSON.parse(atob(r.credential.split('.')[1]));
-            const chip = document.getElementById('user-chip');
-            chip.innerText = "Hi, " + user.given_name; chip.style.display = 'block';
-            document.getElementById('g-login-box').style.display = 'none';
-            document.getElementById('g-profile-box').style.display = 'block';
-            document.getElementById('profile-name').innerText = user.name;
-            setTimeout(() => UI.close(), 1000);
-        }
         window.onload = () => ENGINE.init();
     </script>
 </body>
