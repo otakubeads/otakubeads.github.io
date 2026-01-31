@@ -3,70 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V161 Image Fix</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
+    <title>Otaku Beads | V167 Perfect Path</title>
     <style>
-        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --sec-cont: #4A4458; --out: #49454F; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-top: 130px; }
-        .header-fixed { position: fixed; top: 0; left: 0; right: 0; background: rgba(15, 13, 19, 0.95); backdrop-filter: blur(20px); z-index: 2000; padding: 10px 20px; border-bottom: 1px solid var(--out); }
+        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-top: 20px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: var(--sec-cont); font-size: 10px; color: var(--prim); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
-        .btn-m3 { height: 56px; border-radius: 28px; border: none; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--prim); color: var(--on-prim); }
-        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #1C1921; transition: 0.5s cubic-bezier(0.3, 0, 0, 1); border-radius: 32px 32px 0 0; padding: 24px; display: flex; flex-direction: column; }
-        .sheet.full { transform: translateY(0); }
+        .card { background: var(--card); border-radius: 28px; padding: 10px; border: 1px solid #49454F; }
+        .card img { width: 100%; aspect-ratio: 1; border-radius: 22px; object-fit: cover; background: #222; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: #4A4458; font-size: 10px; color: var(--prim); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
     </style>
 </head>
 <body>
-    <div id="scrim" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:9000;" onclick="CORE.close()"></div>
-    
-    <header class="header-fixed">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1 style="font-size:20px; margin:0;">Otaku Beads</h1>
-            <div style="width:36px; height:36px; border-radius:50%; overflow:hidden; border:1px solid var(--out);" onclick="CORE.open('auth')">
-                <img id="u-p-nav" src="logo.jpg" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-        </div>
-        <div style="background:var(--sec-cont); border-radius:24px; padding:8px 16px; display:flex; align-items:center; margin-top:10px;">
-            <span class="material-symbols-rounded">search</span>
-            <input type="text" id="q" placeholder="Search..." oninput="CORE.render()" style="background:none; border:none; color:white; margin-left:8px; width:100%; outline:none;">
-        </div>
-    </header>
-
     <main id="cat" class="grid"></main>
-
     <script>
         const CORE = {
+            // These match your 'perfect' files exactly [cite: 2026-01-31]
             items: ["Akane_keychain", "Bulma_bracelet", "Chi-Chi_bracelet", "Dengi_keychain", "Gojo_keychain"],
-            async init() {
-                try {
-                    const res = await fetch('names.json');
-                    this.items = await res.json();
-                } catch(e) {}
-                this.render();
-            },
             render() {
-                const q = document.getElementById('q').value.toLowerCase();
-                const container = document.getElementById('cat');
-                // POINTING TO OTAKUBEADS/ SUBFOLDER [cite: 2026-01-31]
-                container.innerHTML = this.items.filter(n => n.toLowerCase().includes(q)).map(name => {
+                document.getElementById('cat').innerHTML = this.items.map(name => {
                     const type = name.toLowerCase().includes('keychain') ? 'Keychain' : 'Bracelet';
                     return `
-                    <div style="background:var(--card); border-radius:28px; padding:10px; border:1px solid var(--out);">
-                        <img src="OtakuBeads/${name}.jpg" style="width:100%; aspect-ratio:1; border-radius:22px; object-fit:cover;" onerror="this.src='logo.jpg'">
-                        <div style="padding:8px 4px 0;">
+                    <div class="card">
+                        <img src="${name}.jpg" onerror="this.src='OtakuBeads/${name}.jpg'; this.onerror=()=>this.src='logo.jpg'">
+                        <div style="padding: 8px 4px;">
                             <span class="badge">${type}</span>
-                            <div style="font-weight:700; font-size:13px; text-transform:capitalize; margin-bottom:8px;">${name.replace(/_/g, ' ')}</div>
-                            <button class="btn-m3" style="height:36px; font-size:12px;">Add</button>
+                            <div style="font-weight:700; font-size:14px; color:white;">${name.replace(/_/g, ' ')}</div>
                         </div>
                     </div>`;
                 }).join('');
-            },
-            open(id) { document.getElementById(id+'-sheet').classList.add('full'); document.getElementById('scrim').style.display='block'; },
-            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); document.getElementById('scrim').style.display='none'; }
+            }
         };
-        window.onload = () => CORE.init();
+        window.onload = () => CORE.render();
     </script>
 </body>
 </html>
