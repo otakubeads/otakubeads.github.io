@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Otaku Beads | Root</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Otaku Beads | Smooth</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
@@ -21,14 +21,14 @@
         header { margin: 8px 12px; padding: 0 12px; height: 64px; background: #353239; border-radius: 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 8px; z-index: 1000; border: 1px solid var(--outline); }
         .brand { font-weight: 700; font-size: 16px; flex-grow: 1; text-align: center; }
         
-        .auth-trigger { display: flex; align-items: center; gap: 8px; background: var(--container); padding: 4px 12px 4px 4px; border-radius: 20px; border: 1px solid var(--outline); cursor: pointer; }
+        .auth-trigger { display: flex; align-items: center; gap: 8px; background: var(--container); padding: 4px; border-radius: 20px; border: 1px solid var(--outline); cursor: pointer; }
         .auth-trigger img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; padding-bottom: 120px; }
-        .card { background: var(--container); border-radius: 24px; padding: 12px; border: 1px solid var(--outline); text-align: center; }
+        .card { background: var(--container); border-radius: 24px; padding: 12px; border: 1px solid var(--outline); transition: transform 0.2s var(--bez); }
+        .card:active { transform: scale(0.98); }
         .card img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 8px; }
 
-        /* DESIGN #26 COMING SOON */
         .coming-soon { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
         .cs-btn { background: #49454F !important; color: #938F99 !important; border: none !important; }
 
@@ -36,15 +36,14 @@
         .sheet.open { transform: translateY(0); }
         .handle { width: 32px; height: 4px; background: var(--outline); border-radius: 2px; margin: 0 auto 24px; flex-shrink: 0; }
         
-        .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 10px; transition: 0.2s; }
         .primary-btn { background: var(--primary); color: var(--on-prim); border: none; font-weight: 700; }
 
-        /* PAXI SECTION #X */
-        .paxi-card { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 16px; background: var(--container); border: 1px solid var(--outline); margin-top: 12px; cursor: pointer; }
-        .paxi-card.active { border: 2px solid var(--primary); background: #353239; }
+        .paxi-card { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 16px; background: var(--container); border: 1px solid var(--outline); margin-top: 12px; cursor: pointer; transition: 0.3s var(--bez); }
+        .paxi-card.active { border: 2px solid var(--primary); background: #353239; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-        .fab { position: fixed; bottom: 16px; right: 16px; background: var(--primary); color: var(--on-prim); height: 56px; padding: 0 24px; border-radius: 18px; border: none; font-weight: 700; z-index: 2000; display: flex; align-items: center; gap: 8px; }
-        #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; display: none; }
+        .fab { position: fixed; bottom: 16px; right: 16px; background: var(--primary); color: var(--on-prim); height: 56px; padding: 0 24px; border-radius: 18px; border: none; font-weight: 700; z-index: 2000; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; display: none; backdrop-filter: blur(4px); }
     </style>
 </head>
 <body>
@@ -54,7 +53,7 @@
         <div class="brand">Otaku Beads</div>
         <div class="auth-trigger" onclick="CORE.open('auth')">
             <img id="head-p" src="logo.jpg">
-            <span id="head-name" style="font-size:12px; font-weight:700; padding-right:4px;">Sign In</span>
+            <span id="head-name" style="font-size:12px; font-weight:700; padding:0 8px;">Sign In</span>
         </div>
     </header>
 
@@ -64,7 +63,7 @@
     <div id="auth-sheet" class="sheet">
         <div class="handle"></div>
         <div style="text-align:center;">
-            <h2 style="margin-bottom:16px;">Secure Login</h2>
+            <h2 style="margin-bottom:16px;">Verified Access</h2>
             <div id="g_btn" style="display:flex; justify-content:center; margin-top:20px;"></div>
             <button class="pill-btn" onclick="CORE.close()" style="margin-top:40px;">Back</button>
         </div>
@@ -72,24 +71,24 @@
 
     <div id="bag-sheet" class="sheet">
         <div class="handle"></div>
-        <h2>Your Bag</h2>
+        <h2>Checkout</h2>
         <div id="bag-list" style="flex-grow:1; overflow-y:auto; margin-top:16px;"></div>
         
         <div class="paxi-section">
             <div class="paxi-card active" id="px-s" onclick="CORE.setPaxi(60, 'Standard', 'px-s')">
-                <div><b>Paxi Standard</b><br><small>7-9 Days</small></div><b>R60</b>
+                <div><b>Standard Delivery</b><br><small>7-9 Days</small></div><b>R60</b>
             </div>
             <div class="paxi-card" id="px-e" onclick="CORE.setPaxi(100, 'Express', 'px-e')">
-                <div><b>Paxi Express</b><br><small>3-5 Days</small></div><b>R100</b>
+                <div><b>Express Delivery</b><br><small>3-5 Days</small></div><b>R100</b>
             </div>
         </div>
 
         <div style="margin:20px 0; text-align:center;"><span id="total" style="font-size:32px; font-weight:700; color:var(--primary);">R0</span></div>
-        <button class="pill-btn primary-btn" onclick="CORE.wa()">WhatsApp Order</button>
-        <button class="pill-btn" onclick="CORE.close()">Close</button>
+        <button class="pill-btn primary-btn" onclick="CORE.wa()">Confirm WhatsApp Order</button>
+        <button class="pill-btn" onclick="CORE.close()">Keep Shopping</button>
     </div>
 
-    <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Menu</h2><button class="pill-btn" onclick="CORE.close()">Close</button></div>
+    <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Collections</h2><button class="pill-btn" onclick="CORE.close()">Close</button></div>
 
     <script>
         const CATALOG = Array.from({length: 28}, (_, i) => ({ id: i + 1, name: `Design #${i+1}` }));
@@ -100,7 +99,7 @@
                 document.getElementById(id+'-sheet').classList.add('open'); 
                 document.getElementById('scrim').style.display='block'; 
                 if(id==='bag') this.refresh();
-                if(id==='auth') this.initGSI();
+                if(id==='auth') setTimeout(() => this.initGSI(), 100);
             },
             close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); document.getElementById('scrim').style.display='none'; },
             add(id) { this.bag[id] = (this.bag[id] || 0) + 1; this.sync(); },
@@ -114,7 +113,7 @@
             refresh() {
                 const l = document.getElementById('bag-list');
                 const e = Object.entries(this.bag);
-                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Empty';
+                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Empty Bag';
                 document.getElementById('total').innerText = `R${Object.values(this.bag).reduce((a,b)=>a+(b*20),0) + this.fee}`;
             },
             render() {
@@ -124,6 +123,7 @@
                 }).join('');
             },
             initGSI() {
+                if (typeof google === 'undefined') return;
                 google.accounts.id.initialize({
                     client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
                     callback: onSignIn
