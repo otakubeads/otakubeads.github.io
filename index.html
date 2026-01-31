@@ -3,44 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otaku Beads | Native Experience</title>
+    <title>Otaku Beads | Pro Native</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { 
-            --surface: #1D1B20; --on-surface: #E6E1E5; 
-            --primary: #D0BCFF; --on-primary: #381E72;
-            --secondary-container: #332F37; --outline: #49454F;
+            --surface: #1D1B20; --on-surf: #E6E1E5; 
+            --primary: #D0BCFF; --on-prim: #381E72;
+            --container: #211F26; --outline: #49454F;
             --error: #F2B8B5; --bez: cubic-bezier(0.2, 0, 0, 1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surface); }
+        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surf); line-height: 1.5; }
 
-        /* HEADER */
-        header { margin: 8px 16px; padding: 4px 12px; height: 56px; background: var(--secondary-container); border-radius: 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 8px; z-index: 1000; border: 1px solid var(--outline); }
+        /* NATIVE-FEEL HEADER */
+        header { margin: 8px 16px; padding: 4px 12px; height: 56px; background: #353239; border-radius: 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 8px; z-index: 1000; border: 1px solid var(--outline); }
         #search-input { background: transparent; border: none; color: white; width: 100%; font-size: 16px; outline: none; }
         
-        /* CARDS */
+        /* M3 CARDS */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; padding-bottom: 120px; }
-        .card { background: #211F26; border-radius: 24px; padding: 8px; border: 1px solid var(--outline); }
-        .card img { width: 100%; aspect-ratio: 1; border-radius: 18px; object-fit: cover; }
+        .card { background: var(--container); border-radius: 24px; padding: 12px; border: 1px solid var(--outline); }
+        .card img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 8px; }
 
-        /* M3 BOTTOM SHEETS */
-        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #2D2933; transition: 0.4s var(--bez); border-radius: 28px 28px 0 0; padding: 24px; text-align: center; display: flex; flex-direction: column; }
+        /* NATIVE BOTTOM SHEETS */
+        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #2D2933; transition: 0.4s var(--bez); border-radius: 28px 28px 0 0; padding: 24px; display: flex; flex-direction: column; align-items: center; }
         .sheet.open { transform: translateY(0); }
-        .handle { width: 32px; height: 4px; background: var(--outline); border-radius: 2px; margin: 0 auto 24px; flex-shrink: 0; }
+        .handle { width: 32px; height: 4px; background: var(--outline); border-radius: 2px; margin-bottom: 24px; }
         
-        /* M3 PILLS */
-        .pill-btn { border: 1px solid var(--outline); color: var(--on-surface); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; margin: 6px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
-        .primary-btn { background: var(--primary); color: var(--on-primary); border: none; }
+        .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; margin-top: 12px; }
+        .primary-btn { background: var(--primary); color: var(--on-prim); border: none; }
+        
+        /* AUTH NATIVE DESIGN */
+        .profile-card { background: var(--container); width: 100%; border-radius: 24px; padding: 32px 16px; border: 1px solid var(--outline); margin-bottom: auto; }
+        .avatar-frame { width: 80px; height: 80px; border-radius: 50%; background: #353239; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--primary); }
+        .login-gate { width: 100%; padding-top: 24px; display: flex; flex-direction: column; align-items: center; }
         
         #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9000; display: none; }
-        .fab { position: fixed; bottom: 24px; right: 16px; background: var(--primary); color: var(--on-primary); height: 56px; padding: 0 24px; border-radius: 16px; display: flex; align-items: center; gap: 12px; border: none; font-weight: 600; z-index: 2000; }
-
-        /* IDENTITY HUB ELEMENTS */
-        .id-card { background: var(--surface); border-radius: 24px; padding: 24px; margin: 16px 0; border: 1px solid var(--outline); }
-        .avatar-lg { width: 64px; height: 64px; border-radius: 50%; background: var(--secondary-container); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--primary); }
+        .fab { position: fixed; bottom: 24px; right: 16px; background: var(--primary); color: var(--on-prim); height: 56px; padding: 0 24px; border-radius: 16px; display: flex; align-items: center; gap: 12px; font-weight: 600; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border:none; }
     </style>
 </head>
 <body>
@@ -49,7 +49,7 @@
     <header>
         <span class="material-symbols-rounded" onclick="CORE.UI.open('menu')">menu</span>
         <input type="text" id="search-input" placeholder="Search designs..." oninput="CORE.LOGIC.search(this.value)">
-        <button onclick="CORE.UI.open('auth')" style="background:none; border:none;"><div id="h-avatar" style="width:32px; height:32px; border-radius:50%; background:var(--outline); overflow:hidden; display:flex; align-items:center; justify-content:center;"><span class="material-symbols-rounded">account_circle</span></div></button>
+        <button onclick="CORE.UI.open('auth')" style="background:none; border:none; color:inherit;"><div id="h-avatar" style="width:32px; height:32px; border-radius:50%; background:var(--outline); overflow:hidden; display:flex; align-items:center; justify-content:center;"><span class="material-symbols-rounded">account_circle</span></div></button>
     </header>
 
     <main class="grid" id="main-grid"></main>
@@ -57,21 +57,25 @@
 
     <div id="auth-sheet" class="sheet">
         <div class="handle"></div>
-        <div class="id-card">
-            <div class="avatar-lg" id="s-avatar"><span class="material-symbols-rounded" style="font-size:32px;">person</span></div>
-            <h2 id="user-display-name">Profile</h2>
-            <p id="user-email" style="opacity:0.6; font-size:13px; margin-top:4px;">Sign in to sync your designs</p>
+        <div class="profile-card">
+            <div class="avatar-frame" id="s-avatar">
+                <span class="material-symbols-rounded" style="font-size:40px; color:var(--primary)">person</span>
+            </div>
+            <h2 id="user-name">Account</h2>
+            <p id="user-status" style="opacity:0.6; font-size:14px;">Sign in to save your favorite designs</p>
         </div>
 
-        <div id="login-container" style="margin-top:auto;">
-            <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onSignIn"></div>
-            <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-shape="pill" data-width="280"></div>
-            <button id="logout-btn" class="pill-btn" style="display:none; color:var(--error); border-color:var(--error); margin-top:12px;" onclick="CORE.AUTH.signOut()">Sign out</button>
-            <button class="pill-btn" onclick="CORE.UI.close()" style="margin-top:12px;">Close</button>
+        <div class="login-gate">
+            <div id="g-btn-wrapper">
+                <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onSignIn"></div>
+                <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-shape="pill" data-size="large"></div>
+            </div>
+            <button id="logout-btn" class="pill-btn" style="display:none; color:var(--error); border-color:var(--error);" onclick="CORE.AUTH.signOut()">Sign out</button>
+            <button class="pill-btn" onclick="CORE.UI.close()">Close</button>
         </div>
     </div>
 
-    <div id="bag-sheet" class="sheet"><div class="handle"></div><h2>Shopping Bag</h2><div id="bag-items-list" style="margin:20px 0;"></div><button class="pill-btn primary-btn">Paxi Checkout</button><button class="pill-btn" onclick="CORE.UI.close()">Close</button></div>
+    <div id="bag-sheet" class="sheet"><div class="handle"></div><h2>Your Bag</h2><div id="bag-list" style="width:100%; margin:20px 0;"></div><button class="pill-btn primary-btn">Checkout with Paxi</button><button class="pill-btn" onclick="CORE.UI.close()">Close</button></div>
     <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Collections</h2><button class="pill-btn" onclick="CORE.LOGIC.search('Beaded'); CORE.UI.close()">Beaded Designs</button><button class="pill-btn" onclick="CORE.LOGIC.search('Keychain'); CORE.UI.close()">Keychain Designs</button><button class="pill-btn" onclick="CORE.LOGIC.search('Bracelet'); CORE.UI.close()">Bracelet Designs</button><button class="pill-btn" onclick="CORE.UI.close()">Close</button></div>
 
     <script>
@@ -84,29 +88,29 @@
         const CORE = {
             bag: JSON.parse(localStorage.getItem('ob_bag') || '[]'),
             UI: {
-                open(id) { document.getElementById(id+'-sheet').classList.add('open'); document.getElementById('scrim').style.display = 'block'; },
-                close() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); document.getElementById('scrim').style.display = 'none'; },
-                add(id) { CORE.bag.push(id); localStorage.setItem('ob_bag', JSON.stringify(CORE.bag)); document.getElementById('bag-count').innerText = CORE.bag.length; },
+                open(id) { document.getElementById(id+'-sheet').classList.add('open'); document.getElementById('scrim').style.display='block'; },
+                close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); document.getElementById('scrim').style.display='none'; },
                 render() {
                     document.getElementById('main-grid').innerHTML = CATALOG.map(p => `
                         <div class="card">
                             <img src="${p.id===26?'Logo.jpg':p.id+'.jpg'}" onerror="this.src='Logo.jpg'">
-                            <div style="padding:10px 4px;"><b>${p.name}</b><br><span style="color:var(--primary)">R${p.price}</span></div>
-                            <button class="pill-btn" style="background:var(--secondary-container); border:none; padding:10px;" onclick="CORE.UI.add(${p.id})">Add</button>
+                            <div style="padding:4px;"><b>${p.name}</b><br><span style="color:var(--primary)">R${p.price}</span></div>
+                            <button class="pill-btn" style="background:#353239; border:none; margin-top:8px;" onclick="CORE.UI.add(${p.id})">Add</button>
                         </div>
                     `).join('');
-                }
+                },
+                add(id) { CORE.bag.push(id); localStorage.setItem('ob_bag', JSON.stringify(CORE.bag)); document.getElementById('bag-count').innerText = CORE.bag.length; }
             },
             AUTH: {
                 init() {
                     const u = JSON.parse(localStorage.getItem('ob_auth') || 'null');
                     if(u) {
-                        document.getElementById('user-display-name').innerText = u.name;
-                        document.getElementById('user-email').innerText = u.email;
+                        document.getElementById('user-name').innerText = u.name;
+                        document.getElementById('user-status').innerText = u.email;
                         const avatar = `<img src="${u.picture}" style="width:100%">`;
                         document.getElementById('h-avatar').innerHTML = avatar;
                         document.getElementById('s-avatar').innerHTML = avatar;
-                        document.querySelector('.g_id_signin').style.display = 'none';
+                        document.getElementById('g-btn-wrapper').style.display = 'none';
                         document.getElementById('logout-btn').style.display = 'flex';
                     }
                 },
