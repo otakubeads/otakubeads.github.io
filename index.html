@@ -3,134 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otaku Beads | Restored</title>
+    <title>Otaku Beads | Beautiful Checkout</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
-        :root { --surface: #1D1B20; --on-surf: #E6E1E5; --primary: #D0BCFF; --on-prim: #381E72; --outline: #49454F; --error: #F2B8B5; }
-        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surf); margin: 0; overflow-x: hidden; }
+        :root { --surface: #1D1B20; --on-surf: #E6E1E5; --primary: #D0BCFF; --on-prim: #381E72; --outline: #49454F; }
+        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surf); margin: 0; }
         
         header { margin: 8px 12px; padding: 0 16px; height: 64px; background: #353239; border-radius: 32px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--outline); position: sticky; top: 8px; z-index: 1000; }
-        .auth-trigger { display: flex; align-items: center; gap: 8px; background: #211F26; padding: 4px; border-radius: 20px; border: 1px solid var(--outline); cursor: pointer; }
-        .auth-trigger img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; padding-bottom: 120px; }
         .card { background: #211F26; border-radius: 24px; padding: 12px; border: 1px solid var(--outline); text-align: center; }
         .card img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 8px; }
 
-        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #2D2933; transition: 0.4s cubic-bezier(0.2, 0, 0, 1); border-radius: 28px 28px 0 0; padding: 24px; }
+        .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #2D2933; transition: 0.4s cubic-bezier(0.2, 0, 0, 1); border-radius: 28px 28px 0 0; padding: 24px; display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
-        .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
-        .primary-btn { background: var(--primary); color: var(--on-prim); border: none; font-weight: 700; }
-        .out-btn { background: #442B2B; color: var(--error); border: 1px solid #603F3F; }
-
+        
+        .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 16px; border-radius: 28px; width: 100%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .primary-btn { background: var(--primary); color: var(--on-prim); border: none; margin-top: auto; }
+        
+        .summary-card { background: #211F26; padding: 20px; border-radius: 24px; margin-top: 16px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .discount { color: #B2FF59; font-weight: 700; }
+        
         #scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; display: none; backdrop-filter: blur(4px); }
-        .fab { position: fixed; bottom: 16px; right: 16px; background: var(--primary); color: var(--on-prim); height: 56px; padding: 0 24px; border-radius: 18px; border: none; font-weight: 700; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
-    <div id="scrim" onclick="CORE.close()"></div>
-    
+    <div id="scrim" onclick="UI.close()"></div>
     <header>
-        <span class="material-symbols-rounded" onclick="CORE.open('menu')">menu</span>
+        <span class="material-symbols-rounded">menu</span>
         <div style="font-weight:700;">Otaku Beads</div>
-        <div class="auth-trigger" onclick="CORE.open('auth')">
-            <img id="head-p" src="logo.jpg">
-            <span id="head-name" style="font-size:12px; font-weight:700; padding:0 8px;">Sign In</span>
-        </div>
+        <div style="background:#211F26; padding:8px 16px; border-radius:20px; border:1px solid var(--outline); cursor:pointer;" onclick="UI.open('auth')">Sign In</div>
     </header>
 
-    <main class="grid" id="main-grid"></main>
-    <button class="fab" onclick="CORE.open('bag')">Bag (<span id="bag-count">0</span>)</button>
-
-    <div id="auth-sheet" class="sheet">
-        <div style="width:32px; height:4px; background:var(--outline); border-radius:2px; margin:0 auto 24px;"></div>
-        <div id="auth-root" style="text-align:center;">
-            <h2 id="auth-title">Account</h2>
-            <div id="g_btn_box" style="display:flex; justify-content:center; margin-top:20px;"><div id="g_btn"></div></div>
-            <div id="user-display" style="display:none; margin-top:20px;">
-                <p id="user-mail" style="opacity:0.6; margin-bottom:12px;"></p>
-                <button class="pill-btn out-btn" onclick="CORE.signOut()">SIGN OUT</button>
-            </div>
-        </div>
-        <button class="pill-btn" onclick="CORE.close()" style="margin-top:20px;">Close</button>
-    </div>
+    <main class="grid" id="catalog-grid"></main>
 
     <div id="bag-sheet" class="sheet">
         <div style="width:32px; height:4px; background:var(--outline); border-radius:2px; margin:0 auto 24px;"></div>
-        <h2>Your Bag</h2>
-        <div id="bag-list" style="margin-top:16px; flex-grow:1;"></div>
-        <div id="promo-summary" style="background:rgba(255,255,255,0.05); padding:16px; border-radius:16px; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between;"><span>Subtotal</span><span id="sub-total">R0</span></div>
-            <div style="display:flex; justify-content:space-between; color:#B2FF59;"><span>B2G1 Discount</span><span id="promo-disc">-R0</span></div>
-            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:20px; margin-top:8px;"><span>Total</span><span id="final-total">R0</span></div>
+        <h2 style="font-size:28px;">Your Bag</h2>
+        <div id="bag-items" style="flex-grow:1; overflow-y:auto; margin:16px 0; font-size:18px; line-height:2;"></div>
+        
+        <div class="summary-card">
+            <div class="row"><span>Subtotal</span><span id="sub-val">R0</span></div>
+            <div class="row discount"><span>B2G1 Discount</span><span id="disc-val">-R0</span></div>
+            <div class="row" style="font-size:24px; font-weight:700; margin-top:12px;"><span>Total</span><span id="total-val">R0</span></div>
         </div>
-        <button class="pill-btn primary-btn" onclick="CORE.pay()">Pay with PayFast</button>
+        <button class="pill-btn primary-btn" style="margin-top:20px;">Pay with PayFast</button>
     </div>
 
     <script>
-        const CATALOG = Array.from({length: 28}, (_, i) => ({ id: i + 1, name: `Design #${i+1}` }));
-        
-        const CORE = {
-            bag: JSON.parse(localStorage.getItem('ob_bag') || '{}'),
-            open(id) { 
-                document.getElementById(id+'-sheet').classList.add('open'); 
-                document.getElementById('scrim').style.display='block'; 
-                if(id==='auth') this.initGSI();
-                if(id==='bag') this.updateBag();
-            },
-            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); document.getElementById('scrim').style.display='none'; },
-            add(id) { this.bag[id] = (this.bag[id] || 0) + 1; this.sync(); },
-            sync() { 
-                localStorage.setItem('ob_bag', JSON.stringify(this.bag)); 
-                document.getElementById('bag-count').innerText = Object.values(this.bag).reduce((a,b)=>a+b,0); 
-            },
-            updateBag() {
-                const list = document.getElementById('bag-list');
-                const items = Object.entries(this.bag);
-                const count = Object.values(this.bag).reduce((a,b)=>a+b,0);
-                const sub = count * 20;
-                const disc = Math.floor(count / 3) * 20;
-                
-                list.innerHTML = items.length ? items.map(([id, q])=>`<div>#${id} x ${q}</div>`).join('') : 'Empty';
-                document.getElementById('sub-total').innerText = `R${sub}`;
-                document.getElementById('promo-disc').innerText = `-R${disc}`;
-                document.getElementById('final-total').innerText = `R${(sub-disc) + 60}`;
-            },
-            initGSI() {
-                google.accounts.id.initialize({
-                    client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
-                    callback: (r) => {
-                        const u = JSON.parse(atob(r.credential.split('.')[1]));
-                        localStorage.setItem('ob_user', JSON.stringify(u));
-                        localStorage.removeItem('ob_lock');
-                        location.reload();
-                    }
-                });
-                google.accounts.id.renderButton(document.getElementById("g_btn"), { theme: "filled_black", shape: "pill" });
-            },
-            signOut() {
-                localStorage.setItem('ob_lock', 'true');
-                localStorage.removeItem('ob_user');
-                location.reload();
-            },
-            pay() { alert("Redirecting to PayFast..."); }
+        const UI = {
+            open(id) { document.getElementById(id+'-sheet').classList.add('open'); document.getElementById('scrim').style.display='block'; },
+            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); document.getElementById('scrim').style.display='none'; }
         };
 
         window.onload = () => {
-            document.getElementById('main-grid').innerHTML = CATALOG.map(p => `
-                <div class="card"><img src="${p.id}.jpg"><b>${p.name}</b><button class="pill-btn" onclick="CORE.add(${p.id})">Add</button></div>
-            `).join('');
-            CORE.sync();
-            const user = JSON.parse(localStorage.getItem('ob_user'));
-            if(user && localStorage.getItem('ob_lock') !== 'true') {
-                document.getElementById('head-p').src = user.picture;
-                document.getElementById('head-name').innerText = user.given_name;
-                document.getElementById('g_btn_box').style.display = 'none';
-                document.getElementById('user-display').style.display = 'block';
-                document.getElementById('user-mail').innerText = user.email;
+            const grid = document.getElementById('catalog-grid');
+            let html = '';
+            for(let i=1; i<=28; i++) {
+                html += `<div class="card"><img src="${i}.jpg"><b>Design #${i}</b><button class="pill-btn" style="margin-top:8px; padding:8px;" onclick="UI.open('bag')">Add</button></div>`;
             }
+            grid.innerHTML = html;
         };
     </script>
 </body>
