@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Otaku Beads</title>
+    <title>Otaku Beads | Root</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
@@ -13,10 +13,10 @@
             --surface: #1D1B20; --on-surf: #E6E1E5; 
             --primary: #D0BCFF; --on-prim: #381E72;
             --container: #211F26; --outline: #49454F;
-            --error: #F2B8B5; --bez: cubic-bezier(0.2, 0, 0, 1);
+            --bez: cubic-bezier(0.2, 0, 0, 1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surf); }
+        body { font-family: 'Google Sans', sans-serif; background: var(--surface); color: var(--on-surf); overflow-x: hidden; }
 
         header { margin: 8px 12px; padding: 0 12px; height: 64px; background: #353239; border-radius: 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 8px; z-index: 1000; border: 1px solid var(--outline); }
         .brand { font-weight: 700; font-size: 16px; flex-grow: 1; text-align: center; }
@@ -64,32 +64,32 @@
     <div id="auth-sheet" class="sheet">
         <div class="handle"></div>
         <div style="text-align:center;">
-            <h2 style="margin-bottom:16px;">Welcome Back</h2>
+            <h2 style="margin-bottom:16px;">Secure Login</h2>
             <div id="g_btn" style="display:flex; justify-content:center; margin-top:20px;"></div>
-            <button class="pill-btn" onclick="CORE.close()" style="margin-top:40px;">Close</button>
+            <button class="pill-btn" onclick="CORE.close()" style="margin-top:40px;">Back</button>
         </div>
     </div>
 
     <div id="bag-sheet" class="sheet">
         <div class="handle"></div>
-        <h2>Bag Content</h2>
+        <h2>Your Bag</h2>
         <div id="bag-list" style="flex-grow:1; overflow-y:auto; margin-top:16px;"></div>
         
         <div class="paxi-section">
             <div class="paxi-card active" id="px-s" onclick="CORE.setPaxi(60, 'Standard', 'px-s')">
-                <div><b>Standard</b><br><small>7-9 Days</small></div><b>R60</b>
+                <div><b>Paxi Standard</b><br><small>7-9 Days</small></div><b>R60</b>
             </div>
             <div class="paxi-card" id="px-e" onclick="CORE.setPaxi(100, 'Express', 'px-e')">
-                <div><b>Express</b><br><small>3-5 Days</small></div><b>R100</b>
+                <div><b>Paxi Express</b><br><small>3-5 Days</small></div><b>R100</b>
             </div>
         </div>
 
         <div style="margin:20px 0; text-align:center;"><span id="total" style="font-size:32px; font-weight:700; color:var(--primary);">R0</span></div>
         <button class="pill-btn primary-btn" onclick="CORE.wa()">WhatsApp Order</button>
-        <button class="pill-btn" onclick="CORE.close()">Back</button>
+        <button class="pill-btn" onclick="CORE.close()">Close</button>
     </div>
 
-    <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Collections</h2><button class="pill-btn" onclick="CORE.close()">Close</button></div>
+    <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Menu</h2><button class="pill-btn" onclick="CORE.close()">Close</button></div>
 
     <script>
         const CATALOG = Array.from({length: 28}, (_, i) => ({ id: i + 1, name: `Design #${i+1}` }));
@@ -114,7 +114,7 @@
             refresh() {
                 const l = document.getElementById('bag-list');
                 const e = Object.entries(this.bag);
-                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Your bag is empty';
+                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Empty';
                 document.getElementById('total').innerText = `R${Object.values(this.bag).reduce((a,b)=>a+(b*20),0) + this.fee}`;
             },
             render() {
@@ -125,7 +125,7 @@
             },
             initGSI() {
                 google.accounts.id.initialize({
-                    client_id: "788019685659-lvst1g9q2p24f0iv4f9u3k6p5ndd5c4u.apps.googleusercontent.com",
+                    client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
                     callback: onSignIn
                 });
                 google.accounts.id.renderButton(document.getElementById("g_btn"), { theme: "filled_black", size: "large", shape: "pill" });
