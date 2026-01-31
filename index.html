@@ -28,6 +28,10 @@
         .card { background: var(--container); border-radius: 24px; padding: 12px; border: 1px solid var(--outline); text-align: center; }
         .card img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 8px; }
 
+        /* DESIGN #26 COMING SOON */
+        .coming-soon { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .cs-btn { background: #49454F !important; color: #938F99 !important; border: none !important; }
+
         .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #2D2933; transition: 0.4s var(--bez); border-radius: 28px 28px 0 0; padding: 24px; display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
         .handle { width: 32px; height: 4px; background: var(--outline); border-radius: 2px; margin: 0 auto 24px; flex-shrink: 0; }
@@ -35,6 +39,7 @@
         .pill-btn { border: 1px solid var(--outline); color: var(--on-surf); background: transparent; padding: 14px; border-radius: 28px; width: 100%; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
         .primary-btn { background: var(--primary); color: var(--on-prim); border: none; font-weight: 700; }
 
+        /* PAXI SECTION #X */
         .paxi-card { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 16px; background: var(--container); border: 1px solid var(--outline); margin-top: 12px; cursor: pointer; }
         .paxi-card.active { border: 2px solid var(--primary); background: #353239; }
 
@@ -61,13 +66,13 @@
         <div style="text-align:center;">
             <h2 style="margin-bottom:16px;">Welcome Back</h2>
             <div id="g_btn" style="display:flex; justify-content:center; margin-top:20px;"></div>
-            <button class="pill-btn" onclick="CORE.close()" style="margin-top:40px;">Back</button>
+            <button class="pill-btn" onclick="CORE.close()" style="margin-top:40px;">Close</button>
         </div>
     </div>
 
     <div id="bag-sheet" class="sheet">
         <div class="handle"></div>
-        <h2>Checkout</h2>
+        <h2>Bag Content</h2>
         <div id="bag-list" style="flex-grow:1; overflow-y:auto; margin-top:16px;"></div>
         
         <div class="paxi-section">
@@ -80,8 +85,8 @@
         </div>
 
         <div style="margin:20px 0; text-align:center;"><span id="total" style="font-size:32px; font-weight:700; color:var(--primary);">R0</span></div>
-        <button class="pill-btn primary-btn" onclick="CORE.wa()">Order via WhatsApp</button>
-        <button class="pill-btn" onclick="CORE.close()">Close</button>
+        <button class="pill-btn primary-btn" onclick="CORE.wa()">WhatsApp Order</button>
+        <button class="pill-btn" onclick="CORE.close()">Back</button>
     </div>
 
     <div id="menu-sheet" class="sheet"><div class="handle"></div><h2>Collections</h2><button class="pill-btn" onclick="CORE.close()">Close</button></div>
@@ -109,13 +114,13 @@
             refresh() {
                 const l = document.getElementById('bag-list');
                 const e = Object.entries(this.bag);
-                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Empty Bag';
+                l.innerHTML = e.length ? e.map(([id, q])=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>#${id} (x${q})</span><b>R${q*20}</b></div>`).join('') : 'Your bag is empty';
                 document.getElementById('total').innerText = `R${Object.values(this.bag).reduce((a,b)=>a+(b*20),0) + this.fee}`;
             },
             render() {
                 document.getElementById('main-grid').innerHTML = CATALOG.map(p => {
                     const isCS = p.id === 26;
-                    return `<div class="card ${isCS ? 'coming-soon' : ''}"><img src="${p.id}.jpg"><b>${p.name}</b><button class="pill-btn" onclick="CORE.add(${p.id})">${isCS ? 'Coming Soon' : 'Add'}</button></div>`;
+                    return `<div class="card ${isCS ? 'coming-soon' : ''}"><img src="${p.id}.jpg"><b>${p.name}</b><button class="pill-btn ${isCS ? 'cs-btn' : ''}" onclick="CORE.add(${p.id})">${isCS ? 'Coming Soon' : 'Add'}</button></div>`;
                 }).join('');
             },
             initGSI() {
@@ -125,10 +130,7 @@
                 });
                 google.accounts.id.renderButton(document.getElementById("g_btn"), { theme: "filled_black", size: "large", shape: "pill" });
             },
-            wa() {
-                const items = Object.entries(this.bag).map(([id,q])=>`#${id}(x${q})`).join(', ');
-                window.open(`https://wa.me/27000000000?text=New Order: ${items} | Method: ${this.type}`);
-            }
+            wa() { window.open(`https://wa.me/27000000000?text=Order`); }
         };
 
         function onSignIn(resp) {
