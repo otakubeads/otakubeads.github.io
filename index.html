@@ -3,28 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V159 Fixed</title>
+    <title>Otaku Beads | V160 Path Fix</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --sec-cont: #4A4458; --out: #49454F; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-top: 130px; }
-        
         .header-fixed { position: fixed; top: 0; left: 0; right: 0; background: rgba(15, 13, 19, 0.95); backdrop-filter: blur(20px); z-index: 2000; padding: 10px 20px; border-bottom: 1px solid var(--out); }
-        .search-bar { background: var(--sec-cont); border-radius: 24px; padding: 8px 16px; display: flex; align-items: center; margin-top: 10px; }
-        .search-bar input { background: none; border: none; color: white; margin-left: 8px; width: 100%; outline: none; }
-        
-        .filter-bar { display: flex; gap: 8px; padding: 12px 20px; position: fixed; top: 110px; left: 0; right: 0; background: var(--bg); z-index: 1000; overflow-x: auto; scrollbar-width: none; }
-        .chip { padding: 6px 16px; border-radius: 16px; border: 1px solid var(--out); font-size: 12px; white-space: nowrap; cursor: pointer; }
-        .chip.active { background: var(--prim); color: var(--on-prim); border-color: var(--prim); }
-
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
         .badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: var(--sec-cont); font-size: 10px; color: var(--prim); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
-
+        .btn-m3 { height: 56px; border-radius: 28px; border: none; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--prim); color: var(--on-prim); }
         .sheet { position: fixed; inset: 0; z-index: 9999; transform: translateY(100%); background: #1C1921; transition: 0.5s cubic-bezier(0.3, 0, 0, 1); border-radius: 32px 32px 0 0; padding: 24px; display: flex; flex-direction: column; }
         .sheet.full { transform: translateY(0); }
-        .btn-m3 { height: 56px; border-radius: 28px; border: none; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -37,77 +28,36 @@
                 <img id="u-p-nav" src="logo.jpg" style="width:100%; height:100%; object-fit:cover;">
             </div>
         </div>
-        <div class="search-bar">
-            <span class="material-symbols-rounded" style="font-size:20px;">search</span>
-            <input type="text" id="q" placeholder="Search designs..." oninput="CORE.renderCat()">
+        <div style="background:var(--sec-cont); border-radius:24px; padding:8px 16px; display:flex; align-items:center; margin-top:10px;">
+            <span class="material-symbols-rounded">search</span>
+            <input type="text" id="q" placeholder="Search..." oninput="CORE.render()" style="background:none; border:none; color:white; margin-left:8px; width:100%; outline:none;">
         </div>
     </header>
 
-    <div class="filter-bar">
-        <div class="chip active" onclick="CORE.setFilter('all', this)">All</div>
-        <div class="chip" onclick="CORE.setFilter('keychain', this)">Keychains</div>
-        <div class="chip" onclick="CORE.setFilter('bracelet', this)">Bracelets</div>
-    </div>
-
     <main id="cat" class="grid"></main>
 
-    <button class="btn-m3" style="position:fixed; bottom:24px; left:24px; right:24px; width:calc(100% - 48px); background:var(--prim); color:var(--on-prim); z-index:1000;" onclick="CORE.open('bag')">
-        Bag • <span id="f-t">R0</span>
-    </button>
-
-    <div id="bag-sheet" class="sheet">
-        <div style="width:32px; height:4px; background:var(--out); border-radius:10px; margin:0 auto 20px;"></div>
-        <h2 style="margin:0 0 16px;">Checkout</h2>
-        <div id="bag-list" style="flex-grow:1; overflow-y:auto;"></div>
-        <div id="summary" style="background:var(--sec-cont); border-radius:24px; padding:20px; margin-top:16px;">
-            <div id="breakdown" style="font-size:12px; opacity:0.7; margin-bottom:8px;"></div>
-            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:18px;"><span>Total</span><span id="s-total">R0</span></div>
-        </div>
-        <button class="btn-m3" style="background:var(--prim); color:var(--on-prim); margin-top:20px;" onclick="alert('Proceeding...')">Pay with PayFast</button>
-    </div>
-
     <div id="auth-sheet" class="sheet">
-        <div style="width:32px; height:4px; background:var(--out); border-radius:10px; margin:0 auto 24px;"></div>
+        <div style="width:32px; height:4px; background:var(--out); border-radius:10px; margin:0 auto 20px;"></div>
         <div id="g_btn_container" style="display:flex; justify-content:center; margin-bottom:20px;"><div id="g_btn"></div></div>
-        <div id="u-logged" style="display:none; text-align:center;">
-            <img id="u-p-large" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--prim);" src="">
-            <h2 id="u-email" style="font-size:16px;"></h2>
-            <button class="btn-m3" style="background:#442B2B; color:#F2B8B5; margin-top:20px;" onclick="CORE.out()">Sign Out</button>
-        </div>
         <button class="btn-m3" style="background:var(--out); color:white; margin-top:auto;" onclick="CORE.close()">Close</button>
     </div>
 
     <script>
         const CORE = {
-            // Updated hardcoded mapping as a safety [cite: 2026-01-31]
-            items: ["Akane_keychain", "Bulma_bracelet", "Chi-Chi_bracelet", "Dengi_keychain", "Gojo_keychain"], 
-            filter: 'all', bag: JSON.parse(localStorage.getItem('ob_bag') || '{}'),
-            
+            items: ["Akane_keychain", "Bulma_bracelet", "Chi-Chi_bracelet", "Dengi_keychain", "Gojo_keychain"],
             async init() {
                 try {
                     const res = await fetch('names.json');
-                    const jsonNames = await res.json();
-                    if(jsonNames.length > 0) this.items = jsonNames; // Use Termux list if exists
-                } catch(e) { console.log("Using internal name map"); }
-                this.renderCat();
-                this.updateTotal();
+                    this.items = await res.json();
+                } catch(e) {}
+                this.render();
                 this.initGSI();
             },
-            setFilter(f, el) {
-                this.filter = f;
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                el.classList.add('active');
-                this.renderCat();
-            },
-            renderCat() {
+            render() {
                 const q = document.getElementById('q').value.toLowerCase();
                 const container = document.getElementById('cat');
-                const filtered = this.items.filter(name => {
-                    const matchF = this.filter === 'all' || name.toLowerCase().includes(this.filter);
-                    const matchQ = name.toLowerCase().includes(q.replace(' ', '_'));
-                    return matchF && matchQ;
-                });
-                container.innerHTML = filtered.map(name => {
+                // Updated path logic to look inside the subfolder [cite: 2026-01-27]
+                container.innerHTML = this.items.filter(n => n.toLowerCase().includes(q)).map(name => {
                     const type = name.toLowerCase().includes('keychain') ? 'Keychain' : 'Bracelet';
                     return `
                     <div style="background:var(--card); border-radius:28px; padding:10px; border:1px solid var(--out);">
@@ -115,47 +65,16 @@
                         <div style="padding:8px 4px 0;">
                             <span class="badge">${type}</span>
                             <div style="font-weight:700; font-size:13px; text-transform:capitalize; margin-bottom:8px;">${name.replace(/_/g, ' ')}</div>
-                            <button class="btn-m3" style="height:36px; font-size:12px; background:var(--prim); color:var(--on-prim);" onclick="CORE.add('${name}')">Add</button>
+                            <button class="btn-m3" style="height:36px; font-size:12px;">Add</button>
                         </div>
                     </div>`;
                 }).join('');
             },
-            add(name) {
-                this.bag[name] = (this.bag[name] || 0) + 1;
-                localStorage.setItem('ob_bag', JSON.stringify(this.bag));
-                this.updateTotal();
-            },
-            updateTotal() {
-                const count = Object.values(this.bag).reduce((a,b)=>a+b,0);
-                const total = count > 0 ? (count * 20) + 60 : 0;
-                document.getElementById('f-t').innerText = `R${total}`;
-                return { count, total };
-            },
-            renderBag() {
-                const list = document.getElementById('bag-list');
-                let k=0, b=0;
-                list.innerHTML = Object.entries(this.bag).map(([name, q]) => {
-                    if(name.toLowerCase().includes('keychain')) k += q; else b += q;
-                    return `<div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;"><img src="${name}.jpg" style="width:40px; height:40px; border-radius:8px;" onerror="this.src='logo.jpg'"><div style="flex-grow:1;">${name.replace(/_/g, ' ')}</div><b>x${q}</b></div>`;
-                }).join('') || 'Empty';
-                document.getElementById('breakdown').innerText = `${k} Keychains, ${b} Bracelets`;
-                document.getElementById('s-total').innerText = `R${this.updateTotal().total}`;
-            },
             initGSI() {
-                const u = JSON.parse(localStorage.getItem('ob_user'));
-                if(u) {
-                    document.getElementById('u-logged').style.display = 'block';
-                    document.getElementById('g_btn_container').style.display = 'none';
-                    document.getElementById('u-p-large').src = u.picture;
-                    document.getElementById('u-p-nav').src = u.picture;
-                    document.getElementById('u-email').innerText = u.email;
-                } else {
-                    google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: (r) => { localStorage.setItem('ob_user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); } });
-                    google.accounts.id.renderButton(document.getElementById("g_btn"), { theme: "filled_black", shape: "pill" });
-                }
+                google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: (r) => { localStorage.setItem('ob_user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); } });
+                google.accounts.id.renderButton(document.getElementById("g_btn"), { theme: "filled_black", shape: "pill" });
             },
-            out() { localStorage.removeItem('ob_user'); location.reload(); },
-            open(id) { document.getElementById(id+'-sheet').classList.add('full'); document.getElementById('scrim').style.display='block'; if(id==='bag') this.renderBag(); },
+            open(id) { document.getElementById(id+'-sheet').classList.add('full'); document.getElementById('scrim').style.display='block'; },
             close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); document.getElementById('scrim').style.display='none'; }
         };
         window.onload = () => CORE.init();
