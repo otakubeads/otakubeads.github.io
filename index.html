@@ -3,111 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V218</title>
+    <title>Otaku Beads | V219 Stable</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 140px; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.85); backdrop-filter: blur(20px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; border-bottom: 1px solid var(--out); }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
+        header { position: sticky; top: 0; background: rgba(15,13,19,0.9); backdrop-filter: blur(15px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; border-bottom: 1px solid var(--out); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
-        .card { background: var(--card); border-radius: 28px; padding: 12px; border: 1px solid var(--out); }
-        .sheet { position: fixed; inset: 0; z-index: 10000; transform: translateY(100%); background: var(--bg); transition: 0.5s cubic-bezier(0.3, 0, 0, 1); border-radius: 32px 32px 0 0; padding: 24px; overflow-y: auto; }
+        .card { background: var(--card); border-radius: 24px; padding: 12px; border: 1px solid var(--out); display: flex; flex-direction: column; }
+        .card img { width: 100%; aspect-ratio: 1; border-radius: 18px; object-fit: cover; margin-bottom: 12px; }
+        .sheet { position: fixed; inset: 0; z-index: 10000; transform: translateY(100%); background: var(--bg); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); border-radius: 28px 28px 0 0; padding: 24px; overflow-y: auto; }
         .sheet.full { transform: translateY(0); }
-        .btn-m3 { height: 56px; border-radius: 28px; border: none; font-weight: 700; width: 100%; background: var(--prim); color: var(--on-prim); cursor: pointer; }
-        #bag-home { position: fixed; bottom: 30px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 18px 28px; border-radius: 32px; z-index: 5000; font-weight: 700; border: none; }
-        #user-greeting { font-size: 14px; color: var(--prim); font-weight: 700; display: none; }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; width: 100%; background: var(--prim); color: var(--on-prim); cursor: pointer; }
+        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 5000; font-weight: 700; border: none; box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; }
+        body.sheet-open { overflow: hidden; }
+        body.sheet-open #bag-home { display: none; }
     </style>
 </head>
 <body>
     <header>
-        <div style="display:flex; align-items:center; gap:12px;">
-            <img src="logo.jpg" style="width:38px; height:38px; border-radius:12px;">
-            <h1 style="font-size:20px; margin:0;">Otaku Beads</h1>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="logo.jpg" style="width:32px; height:32px; border-radius:8px;">
+            <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
         </div>
-        <div style="display:flex; gap:16px; align-items:center;">
-            <span id="user-greeting">Hi, Guest</span>
-            <span class="material-symbols-rounded" onclick="HARMONY.ui('auth')" style="color:var(--prim); cursor:pointer;">account_circle</span>
+        <div style="display:flex; gap:16px;">
+            <span class="material-symbols-rounded" onclick="UI.open('auth')" style="color:var(--prim); cursor:pointer;">account_circle</span>
         </div>
     </header>
 
-    <button id="bag-home" onclick="HARMONY.ui('cart')">
+    <button id="bag-home" onclick="UI.open('cart')">
         <span class="material-symbols-rounded">shopping_bag</span>
-        <span id="bag-label">R0</span>
+        <span id="bag-total">R0</span>
     </button>
 
     <main id="store-grid" class="grid"></main>
 
     <div id="auth-sheet" class="sheet">
-        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-            <h2 id="auth-header">Google Harmony</h2>
-            <span class="material-symbols-rounded" onclick="HARMONY.close()" style="cursor:pointer">close</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>Account</h2>
+            <span class="material-symbols-rounded" onclick="UI.close()" style="cursor:pointer">close</span>
         </div>
-        <div id="g-login-ui">
-            <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onGoogleAuth"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="pill"></div>
-        </div>
-        <div id="g-logout-ui" style="display:none; text-align:center;">
-            <p id="profile-name" style="margin-bottom:20px; font-size:18px;"></p>
-            <button class="btn-m3" style="background:#333; color:white;" onclick="HARMONY.logout()">Sign Out</button>
-        </div>
+        <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onSignIn"></div>
+        <div class="g_id_signin" data-type="standard"></div>
     </div>
 
-    <div id="cart-sheet" class="sheet">...</div>
+    <div id="cart-sheet" class="sheet">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>Your Bag</h2>
+            <span class="material-symbols-rounded" onclick="UI.close()" style="cursor:pointer">close</span>
+        </div>
+        <div id="cart-items" style="margin-bottom:20px;"></div>
+        <div style="background:var(--card); padding:16px; border-radius:20px; border:1px solid var(--out); margin-bottom:20px;">
+            <p style="margin:0 0 10px 0; font-weight:700;">Delivery (Paxi Section #X)</p>
+            <select id="paxi-opt" style="width:100%; padding:12px; border-radius:12px; background:var(--bg); color:white; border:1px solid var(--out);">
+                <option value="Standard (R60)">Standard - R60</option>
+                <option value="Express (R100)">Express - R100</option>
+            </select>
+        </div>
+        <button class="btn-m3" onclick="CORE.checkout()">Confirm on WhatsApp</button>
+    </div>
 
     <script>
-        const HARMONY = {
+        const UI = {
+            open(id) { 
+                if(id === 'cart') CORE.renderCart();
+                document.getElementById(id+'-sheet').classList.add('full'); 
+                document.body.classList.add('sheet-open'); 
+            },
+            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); document.body.classList.remove('sheet-open'); }
+        };
+
+        const CORE = {
             bag: {}, total: 0,
             async init() {
                 const res = await fetch('names.json?v=' + Date.now());
                 this.db = await res.json();
                 this.renderStore();
             },
-            ui(id) { document.getElementById(id+'-sheet').classList.add('full'); document.body.classList.add('sheet-open'); },
-            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); document.body.classList.remove('sheet-open'); },
+            add(name, price) {
+                this.bag[name] = (this.bag[name] || 0) + 1;
+                this.total += price;
+                document.getElementById('bag-total').innerText = 'R' + this.total;
+            },
             renderStore() {
-                document.getElementById('store-grid').innerHTML = this.db.map(name => {
-                    const isSoon = name.includes('26');
-                    const p = name.toLowerCase().includes('keychain') ? 50 : 40;
+                document.getElementById('store-grid').innerHTML = this.db.map(n => {
+                    const isSoon = n.includes('26');
+                    const price = n.toLowerCase().includes('keychain') ? 50 : 40;
                     return `
-                    <div class="card" ${isSoon ? 'style="opacity:0.6"' : ''}>
-                        <img src="${name}.jpg" onerror="this.src='coming soon1.jpeg'">
-                        <div style="margin:12px 0; font-weight:700;">Design ${name}</div>
-                        <button class="btn-m3" style="height:40px; font-size:12px;" ${isSoon ? 'disabled' : ''} onclick="HARMONY.add('${name}',${p})">
-                            ${isSoon ? 'Soon' : 'Add Design - R'+p}
+                    <div class="card" ${isSoon ? 'style="opacity:0.5"' : ''}>
+                        <img src="${n}.jpg" onerror="this.src='coming soon1.jpeg'">
+                        <div style="margin-bottom:12px; font-weight:700;">Design ${n.replace('.jpg','')}</div>
+                        <button class="btn-m3" style="height:38px; font-size:12px;" ${isSoon ? 'disabled' : ''} onclick="CORE.add('${n}', ${price})">
+                            ${isSoon ? 'Coming Soon' : 'Add - R'+price}
                         </button>
                     </div>`;
                 }).join('');
             },
-            add(n, p) { this.total += p; document.getElementById('bag-label').innerText = 'R' + this.total; },
-            logout() {
-                google.accounts.id.disableAutoSignIn();
-                location.reload(); // Refresh to reset state securely
+            renderCart() {
+                const container = document.getElementById('cart-items');
+                const keys = Object.keys(this.bag);
+                container.innerHTML = keys.length ? keys.map(k => `
+                    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--out);">
+                        <span>Design ${k} (x${this.bag[k]})</span>
+                        <span>R${this.bag[k] * (k.includes('keychain')?50:40)}</span>
+                    </div>`).join('') : "<p style='text-align:center; opacity:0.5;'>Bag is empty</p>";
+            },
+            checkout() {
+                if(this.total === 0) return alert("Empty Bag!");
+                const del = document.getElementById('paxi-opt').value;
+                const items = Object.keys(this.bag).map(k => `Design ${k} x${this.bag[k]}`).join(', ');
+                window.open(`https://wa.me/27123456789?text=Order: ${items} | Delivery: ${del} | Total: R${this.total}`, '_blank');
             }
         };
 
-        // THE HARMONY IDENTITY LINK [cite: 2026-01-31]
-        function onGoogleAuth(response) {
-            const base64Url = response.credential.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const user = JSON.parse(window.atob(base64));
-            
-            // Visual recognition
-            document.getElementById('user-greeting').innerText = `Hi, ${user.given_name}`;
-            document.getElementById('user-greeting').style.display = 'block';
-            document.getElementById('profile-name').innerText = user.name;
-            
-            // Switch UI
-            document.getElementById('g-login-ui').style.display = 'none';
-            document.getElementById('g-logout-ui').style.display = 'block';
-            document.getElementById('auth-header').innerText = "Account Verified";
-            
-            console.log("Harmony Engine recognized user:", user.email);
-            setTimeout(() => HARMONY.close(), 1000); // Auto-close sheet after success
-        }
-
-        window.onload = () => HARMONY.init();
+        function onSignIn(response) { console.log("User Logged In"); UI.close(); }
+        window.onload = () => CORE.init();
     </script>
 </body>
 </html>
