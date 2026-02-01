@@ -2,121 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V249 Master</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otaku Beads | V251</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
-        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.85); backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
+        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: white; margin: 0; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid var(--out); display: flex; flex-direction: column; min-height: 320px; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #2A2631; }
-        .card-content { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .btn-m3 { height: 44px; border-radius: 22px; border: none; font-weight: 700; width: 100%; background: var(--prim); color: var(--on-prim); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .sheet { position: fixed; inset: 0; z-index: 10000; transform: translateY(100%); background: var(--bg); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); border-radius: 32px 32px 0 0; padding: 24px; visibility: hidden; overflow-y: auto; }
-        .sheet.full { transform: translateY(0); visibility: visible; }
-        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
-        .coming-soon { filter: grayscale(1); opacity: 0.6; pointer-events: none; }
+        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid #49454F; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
     </style>
 </head>
 <body>
-    <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img src="logo.jpg" style="width:32px; height:32px; border-radius:8px;">
-            <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
-        </div>
-        <span class="material-symbols-rounded" onclick="UI.open('auth')" style="color:var(--prim); cursor:pointer; font-size:28px;">account_circle</span>
+    <header style="padding: 20px; border-bottom: 1px solid #444; display: flex; justify-content: space-between;">
+        <span>Otaku Beads</span>
+        <span class="material-symbols-rounded" onclick="UI.open('auth')">account_circle</span>
     </header>
 
     <main id="store-grid" class="grid"></main>
 
-    <button id="bag-home" onclick="UI.open('cart')">
-        <span class="material-symbols-rounded">shopping_bag</span>
-        <span id="bag-count">R0</span>
-    </button>
-
-    <div id="auth-sheet" class="sheet">
-        <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
-            <span class="material-symbols-rounded" onclick="UI.close()" style="cursor:pointer">arrow_back</span>
-            <h2 style="margin:0">Account</h2>
-            <div style="width:24px"></div>
-        </div>
-        <div id="g-login-box" style="text-align:center;">
-            <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="handleAuth"></div>
-            <div class="g_id_signin" data-type="standard"></div>
-        </div>
-        <div id="g-profile-box" style="display:none;">
-            <div style="background:rgba(208,188,255,0.1); border:1px dashed var(--prim); border-radius:24px; padding:16px; margin-bottom:20px;">
-                <p style="font-size:12px; font-weight:700; color:var(--prim); margin:0 0 10px 0;">SYSTEM STATUS ⚓</p>
-                <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Deployment</span><span style="color:#81C784;">● Active</span></div>
-                <div style="display:flex; justify-content:space-between; font-size:13px; margin:5px 0;"><span>Code</span><span>V249 Stable</span></div>
-            </div>
-            <button class="btn-m3" style="margin-bottom:12px;" onclick="UI.open('reviews')">Customer Reviews</button>
-            <button class="btn-m3" style="background:#333; color:white;" onclick="location.reload()">Sign Out</button>
-        </div>
-    </div>
-
-    <div id="reviews-sheet" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-            <h2 style="margin:0">Reviews</h2>
-            <span class="material-symbols-rounded" onclick="UI.close()">close</span>
-        </div>
-        <div id="reviews-list"></div>
-    </div>
-
     <script>
-        const UI = {
-            open(id) { document.getElementById(id+'-sheet').classList.add('full'); },
-            close() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('full')); }
-        };
-
         const ENGINE = {
-            bag: {},
-            // RESTORED PRODUCT MAPPING [cite: 2026-01-29]
-            products: [
-                {id: 1, name: "Akane keychain", price: 50},
-                {id: 2, name: "Bulma bracelet", price: 40},
-                {id: 3, name: "Chi-Chi bracelet", price: 40},
-                {id: 4, name: "Dengi keychain", price: 50},
-                // Add the rest of your mapping here
+            // Mapping names with underscores to match your files [cite: 2026-01-27, 2026-01-29]
+            inventory: [
+                "Akane_keychain.jpg", "Bulma_bracelet.jpg", "Chi-Chi_bracelet.jpg", 
+                "Dengi_keychain.jpg", "Logo.jpg" 
             ],
             init() {
                 const grid = document.getElementById('store-grid');
-                // Generating 1-28 using the Restore names where available [cite: 2026-01-27]
-                grid.innerHTML = Array.from({length: 28}, (_, i) => {
-                    const id = i + 1;
-                    const pData = this.products.find(p => p.id === id) || {name: `Design #${id}`, price: 40};
-                    const isSoon = id === 26;
+                grid.innerHTML = this.inventory.map(fileName => {
+                    if(fileName === "Logo.jpg") return ''; // Skip logo in grid [cite: 2026-01-26]
+                    
+                    // Logic: Keep underscores for the src, but remove for the label [cite: 2026-01-29]
+                    const displayName = fileName.replace('.jpg', '').split('_').join(' ');
+                    const price = fileName.toLowerCase().includes('keychain') ? 50 : 40; [cite: 2026-01-29]
+                    
                     return `
-                    <div class="card ${isSoon ? 'coming-soon' : ''}">
-                        <img src="${id}.jpg" onerror="this.src='placeholder.jpg'">
-                        <div class="card-content">
-                            <div style="font-weight:700; font-size:13px; margin-bottom:8px;">${pData.name}</div>
-                            <button class="btn-m3" ${isSoon ? 'disabled' : ''} onclick="ENGINE.add('${pData.name}', ${pData.price})">
-                                ${isSoon ? 'Soon' : 'Add - R' + pData.price}
+                    <div class="card">
+                        <img src="${fileName}" onerror="this.src='placeholder.jpg'">
+                        <div style="padding:15px;">
+                            <p style="font-weight:700; margin:0 0 8px 0;">${displayName}</p>
+                            <button style="width:100%; padding:10px; border-radius:20px; border:none; background:var(--prim);">
+                                Add - R${price}
                             </button>
                         </div>
                     </div>`;
                 }).join('');
-            },
-            add(name, p) { this.bag[name] = (this.bag[name] || 0) + 1; this.updateTotal(); },
-            updateTotal() {
-                let total = Object.entries(this.bag).reduce((acc, [name, qty]) => {
-                    const price = name.toLowerCase().includes('keychain') ? 50 : 40;
-                    return acc + (price * qty);
-                }, 0);
-                document.getElementById('bag-count').innerText = 'R' + total;
             }
         };
-
-        function handleAuth(r) {
-            document.getElementById('g-login-box').style.display = 'none';
-            document.getElementById('g-profile-box').style.display = 'block';
-        }
-
         window.onload = () => ENGINE.init();
     </script>
 </body>
