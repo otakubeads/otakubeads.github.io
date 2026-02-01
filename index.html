@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V266 Live</title>
+    <title>Otaku Beads | V268 Live</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
@@ -29,9 +29,10 @@
     <div id="g_id_onload" 
          data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" 
          data-auto_select="true" 
-         data-callback="handleAuth">
+         data-callback="handleAuth"
+         data-itp_support="true">
     </div>
-    <div id="snackbar">Welcome back!</div>
+    <div id="snackbar">Welcome!</div>
 
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
@@ -54,12 +55,12 @@
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="width:40px; height:4px; background:var(--out); border-radius:2px; margin:0 auto 20px;"></div>
             <h2 id="user-name" style="margin:0 0 20px 0;">Account</h2>
-            <div style="background:rgba(208,188,255,0.1); border:1px dashed var(--prim); border-radius:20px; padding:16px; margin-bottom:20px;">
+            <div id="g-signin-btn" class="g_id_signin" data-type="standard"></div>
+            <div style="background:rgba(208,188,255,0.1); border:1px dashed var(--prim); border-radius:20px; padding:16px; margin:20px 0;">
                 <p style="font-size:11px; font-weight:700; color:var(--prim); margin:0 0 8px 0;">SYSTEM STATUS ⚓</p>
-                <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Deployment</span><span style="color:#81C784;">● Active</span></div>
-                <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:4px;"><span>Code</span><span>V266 Live</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Google Engine</span><span style="color:#81C784;">● Connected</span></div>
             </div>
-            <div class="g_id_signin" data-type="standard"></div>
+            <button class="btn-m3" onclick="UI.close('account')">Close Menu</button>
         </div>
     </div>
 
@@ -74,7 +75,7 @@
                 <label class="paxi-option"><input type="radio" name="paxi" value="60" onclick="ENGINE.updateTotal()"><div>Paxi Standard - R60</div></label>
                 <label class="paxi-option"><input type="radio" name="paxi" value="100" onclick="ENGINE.updateTotal()"><div>Paxi Express - R100</div></label>
             </div>
-            <button class="btn-m3" id="final-btn" onclick="alert('Order Sent to Engine! ⚓')">Pay R0</button>
+            <button class="btn-m3" id="final-btn" onclick="alert('Order Sent! ⚓')">Pay R0</button>
         </div>
     </div>
 
@@ -93,7 +94,8 @@
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             document.getElementById('user-name').innerText = payload.name;
             document.getElementById('user-btn').innerHTML = `<img src="${payload.picture}" style="width:100%">`;
-            UI.showToast("Welcome, " + payload.given_name + "! ⚓"); [cite: 2026-02-01]
+            document.getElementById('g-signin-btn').style.display = 'none';
+            UI.showToast("Welcome, " + payload.given_name + "! ⚓");
         }
 
         const ENGINE = {
@@ -103,7 +105,8 @@
                 const grid = document.getElementById('store-grid');
                 grid.innerHTML = this.inventory.map(file => {
                     const price = file.toLowerCase().includes('keychain') ? 50 : 40;
-                    return `<div class="card"><img src="${file}" onerror="this.src='coming soon1.jpeg'" style="width:100%; aspect-ratio:1/1; object-fit:cover;"><div style="padding:14px;"><div style="font-weight:700; font-size:13px; margin-bottom:8px;">${file.replace('.jpg','')}</div><button class="btn-m3" onclick="ENGINE.add(${price})">Add - R${price}</button></div></div>`;
+                    const name = file.split('_')[0].replace('.jpg','');
+                    return `<div class="card"><img src="${file}" onerror="this.src='coming soon1.jpeg'" style="width:100%; aspect-ratio:1/1; object-fit:cover;"><div style="padding:14px;"><div style="font-weight:700; font-size:13px; margin-bottom:8px;">${name}</div><button class="btn-m3" onclick="ENGINE.add(${price})">Add - R${price}</button></div></div>`;
                 }).join('');
             },
             add(p) { this.subtotal += p; this.updateTotal(); },
