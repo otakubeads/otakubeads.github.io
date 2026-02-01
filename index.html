@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V294 Restored</title>
+    <title>Otaku Beads | V295 Payments</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://pay.google.com/gp/p/js/pay.js" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
@@ -21,18 +22,16 @@
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; transition: transform 0.2s var(--spring); }
         .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s ease; }
         .btn-m3:active { transform: scale(0.94); filter: brightness(1.2); }
-        .btn-clear { background: var(--err); color: var(--on-err); border: none; padding: 8px 16px; border-radius: 14px; font-weight: 700; font-size: 12px; display: none; align-items: center; gap: 4px; transition: 0.2s; }
-        .btn-clear:active { transform: scale(0.9); opacity: 0.8; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; opacity: 0; transition: opacity 0.3s ease; }
         .sheet-overlay.active { display: flex; opacity: 1; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0; box-sizing: border-box; height: 88vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s var(--spring); }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0; box-sizing: border-box; height: 90vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s var(--spring); }
         .sheet-overlay.active .sheet-content { transform: translateY(0); }
         .sheet-body { flex: 1; overflow-y: auto; padding: 0 24px; -webkit-overflow-scrolling: touch; }
         .sheet-footer { padding: 24px; background: var(--sheet); border-top: 1px solid var(--out); }
         .paxi-chip { background: var(--out); padding: 12px 16px; border-radius: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s ease; }
         .paxi-chip input { display: none; }
         .paxi-chip.active { border-color: var(--prim); background: var(--on-prim); }
-        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 18px 28px; border-radius: 28px; z-index: 999; font-weight: 800; border: none; display: flex; align-items: center; gap: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.7); transition: transform 0.2s var(--spring); }
+        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 18px 28px; border-radius: 28px; z-index: 999; font-weight: 800; border: none; display: flex; align-items: center; gap: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.7); }
     </style>
 </head>
 <body>
@@ -56,26 +55,35 @@
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <h2 style="margin:0; font-size:24px;">Bag</h2>
-                    <button id="clear-all-btn" class="btn-clear" onclick="ENGINE.clearCart()">
-                        <span class="material-symbols-rounded" style="font-size:18px;">delete_sweep</span> Clear
-                    </button>
-                </div>
+                <h2 style="margin:0; font-size:24px;">Checkout</h2>
                 <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;"><span class="material-symbols-rounded">close</span></button>
             </div>
+            
             <div class="sheet-body">
+                <div style="background:var(--on-prim); color:var(--prim); padding:16px; border-radius:20px; margin-bottom:20px; font-size:13px; line-height:1.5;">
+                    <b style="display:block; margin-bottom:4px;">How to Order:</b>
+                    1. Add your beads to the bag.<br>
+                    2. Select your PAXI delivery method.<br>
+                    3. Tap <b>"Confirm & Send Receipt"</b>.<br>
+                    4. Send the auto-generated message to our WhatsApp to finalize!
+                </div>
+
                 <div id="cart-list"></div>
+                
                 <div style="margin:24px 0;">
-                    <p style="font-weight:700; color:var(--prim); margin-bottom:12px;">PAXI Delivery ⚓</p>
+                    <p style="font-weight:700; color:var(--prim); margin-bottom:12px;">Delivery Method ⚓</p>
                     <label class="paxi-chip active"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"><span class="material-symbols-rounded">store</span><div style="flex:1;"><b>Collection</b><br><small>R0 • Immediate</small></div></label>
                     <label class="paxi-chip"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"><span class="material-symbols-rounded">local_shipping</span><div style="flex:1;"><b>Standard</b><br><small>R60 • 7-9 Days</small></div></label>
                     <label class="paxi-chip"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"><span class="material-symbols-rounded">speed</span><div style="flex:1;"><b>Express</b><br><small>R100 • 3-5 Days</small></div></label>
                 </div>
             </div>
+
             <div class="sheet-footer">
-                <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:24px; color:var(--success);"><span>Grand Total</span><span id="final-total">R0</span></div>
-                <button class="btn-m3" onclick="ENGINE.processPayment()">Secure Checkout</button>
+                <div id="gpay-container" style="margin-bottom:16px;"></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:24px; color:var(--success);"><span>Total</span><span id="final-total">R0</span></div>
+                <button class="btn-m3" onclick="ENGINE.sendWhatsApp()">
+                    <span class="material-symbols-rounded">chat</span> Confirm & Send Receipt
+                </button>
             </div>
         </div>
     </div>
@@ -116,40 +124,42 @@
                     return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><div style="font-size:11px; color:var(--prim); font-weight:700; text-transform:uppercase; margin-bottom:4px;">${type}</div><div style="font-weight:700; text-transform:capitalize; margin-bottom:12px; font-size:14px;">${name}</div><button class="btn-m3" onclick="ENGINE.add('${file}','${name}','${type}',${price})">Add R${price}</button></div></div>`;
                 }).join('');
                 this.update();
-                this.checkAuth();
-            },
-            checkAuth() {
-                const user = JSON.parse(localStorage.getItem('user'));
-                if(user) {
-                    document.getElementById('google-login-anchor').style.display = 'none';
-                    document.getElementById('view-logged-in').style.display = 'block';
-                    document.getElementById('user-anchor').outerHTML = `<img src="${user.picture}" style="width:100%; height:100%; object-fit:cover;">`;
-                    document.getElementById('user-profile-large').innerHTML = `<img src="${user.picture}" style="width:100%">`;
-                    document.getElementById('user-full-name').innerText = user.name;
-                }
             },
             add(file, name, type, price) { if(!this.cart[name]) this.cart[name] = { file, type, price, qty: 0 }; this.cart[name].qty++; this.update(); },
             changeQty(name, delta) { if(this.cart[name]) { this.cart[name].qty += delta; if(this.cart[name].qty <= 0) delete this.cart[name]; this.update(); } },
-            clearCart() { if(confirm("Clear your whole bag?")) { this.cart = {}; this.update(); } },
             update() {
                 localStorage.setItem('otaku_cart_v3', JSON.stringify(this.cart));
-                let sub = 0, html = '', count = 0;
+                let sub = 0, html = '';
                 for(let n in this.cart) {
-                    const i = this.cart[n]; sub += (i.price * i.qty); count++;
+                    const i = this.cart[n]; sub += (i.price * i.qty);
                     html += `<div style="display:flex; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.05);"><img src="${i.file}" style="width:64px; height:64px; border-radius:16px; object-fit:cover;"><div style="flex:1;"><div style="font-weight:700; text-transform:capitalize;">${n}</div><div style="color:var(--prim); font-weight:700;">R${i.price}</div></div><div style="display:flex; align-items:center; background:var(--out); border-radius:24px; padding:4px; gap:12px;"><button style="width:32px; height:32px; border:none; background:none; color:white; font-size:20px;" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:800;">${i.qty}</span><button style="width:32px; height:32px; border:none; background:none; color:white; font-size:20px;" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
                 }
                 const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
                 document.querySelectorAll('.paxi-chip').forEach(c => { c.classList.remove('active'); if(c.querySelector('input').checked) c.classList.add('active'); });
                 document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('final-total').innerText = 'R' + (sub + ship);
-                document.getElementById('cart-list').innerHTML = html || '<p style="text-align:center; padding:40px; opacity:0.5;">Your bag is empty.</p>';
-                document.getElementById('clear-all-btn').style.display = count > 0 ? 'flex' : 'none';
+                document.getElementById('cart-list').innerHTML = html || '<p style="text-align:center; padding:40px; opacity:0.5;">Bag is empty.</p>';
             },
-            processPayment() { alert("Connecting to Google Engine for ZAR Checkout... ⚓"); }
+            sendWhatsApp() {
+                const user = JSON.parse(localStorage.getItem('user')) || { name: "Guest" };
+                let items = ""; let sub = 0;
+                for(let n in this.cart) { 
+                    const i = this.cart[n]; items += `- ${n} (x${i.qty}): R${i.price*i.qty}\n`; sub += (i.price*i.qty);
+                }
+                const ship = document.querySelector('input[name="paxi"]:checked').parentElement.innerText.split('•')[0].trim();
+                const total = document.getElementById('final-total').innerText;
+                const msg = `⭐ *Otaku Beads Order Receipt* ⭐\n\n*Customer:* ${user.name}\n\n*Items:*\n${items}\n*Delivery:* ${ship}\n*Total:* ${total}\n\n⚓ _Generated by Otaku Brain_`;
+                window.open(`https://wa.me/27763135069?text=${encodeURIComponent(msg)}`);
+            }
         };
 
-        function handleCredentialResponse(r) { const user = JSON.parse(atob(r.credential.split('.')[1])); localStorage.setItem('user', JSON.stringify(user)); location.reload(); }
-        window.onload = () => { ENGINE.init(); google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("google-login-anchor"), { theme: "filled_blue", size: "large", shape: "pill" }); };
+        window.onload = () => {
+            ENGINE.init();
+            // GOOGLE PAY BLUEPRINT [cite: 2026-02-01]
+            const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+            const button = paymentsClient.createButton({onClick: () => alert("Google Pay: Add Payment Method triggered! ⚓")});
+            document.getElementById('gpay-container').appendChild(button);
+        };
     </script>
 </body>
 </html>
