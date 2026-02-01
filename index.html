@@ -15,6 +15,8 @@
         .m3-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #CAC4D0; }
         .m3-card img { width: 100%; display: block; aspect-ratio: 1/1; object-fit: cover; }
         .card-info { padding: 12px; text-align: center; }
+        .coming-soon { filter: grayscale(1); opacity: 0.6; }
+        .m3-btn-disabled { background: #E1E2E1; color: #757575; border: none; padding: 10px; width: 100%; border-radius: 20px; font-weight: 500; cursor: not-allowed; }
         .checkout-section { padding: 24px; border-radius: 28px 28px 0 0; background: #fff; border-top: 1px solid var(--m3-o); margin-top: 20px; }
         .paxi-card { border: 1px solid var(--m3-o); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; }
         .zar::before { content: "R "; }
@@ -32,7 +34,7 @@
         <h3>Delivery (PAXI)</h3>
         <div class="paxi-card"><span>Standard (7-9 Days)</span><span class="zar">60.00</span></div>
         <div class="paxi-card"><span>Express (3-5 Days)</span><span class="zar">100.00</span></div>
-        <div style="margin-top:24px; color:var(--m3-p); display:flex; align-items:center;">
+        <div id="google-anchor" style="margin-top:24px; color:var(--m3-p); display:flex; align-items:center;">
              <span class="material-icons-sharp" style="margin-right:8px;">anchor</span>
              <p style="margin:0; font-size: 14px; font-weight:500;">GOOGLE DOES ALL HEAVY DUTY LIFTING</p>
         </div>
@@ -50,7 +52,6 @@
         
         const grid = document.getElementById('gallery-grid');
         images.forEach(file => {
-            // Remove extension and underscores for clean display
             const displayName = file.split('.')[0].replace(/_/g, ' ').replace('keychain', '').replace('bracelet', '');
             const card = document.createElement('div');
             card.className = 'm3-card';
@@ -58,8 +59,15 @@
             grid.appendChild(card);
         });
 
-        /** * MASTER DEPLOY COMMAND:
-         * git add index.html && git commit -m "Fix: Final M3 Expressive UI and PAXI Restoration" && git push origin main
+        // Design #26 Placeholder
+        const d26 = document.createElement('div');
+        d26.className = 'm3-card coming-soon';
+        d26.innerHTML = `<img src="26.jpg"><div class="card-info"><p style="margin:0; font-weight:500;">Design #26</p><button class="m3-btn-disabled" disabled>Coming Soon</button></div>`;
+        grid.appendChild(d26);
+
+        /**
+         * TERMINAL DEPLOY COMMAND:
+         * Git add index.html && git commit -m "Fix: Final M3 Expressive UI and PAXI Restoration" && git push origin main
          */
     </script>
 </body>
