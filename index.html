@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V256 Customer First</title>
+    <title>Otaku Beads | V258 ZAR</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
@@ -11,10 +11,9 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
         header { position: sticky; top: 0; background: rgba(15,13,19,0.85); backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid var(--out); display: flex; flex-direction: column; transition: transform 0.2s; }
-        .card:active { transform: scale(0.98); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #2A2631; }
-        .btn-m3 { height: 44px; border-radius: 22px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid var(--out); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .btn-m3 { height: 44px; border-radius: 22px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; }
         #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
     </style>
 </head>
@@ -24,7 +23,7 @@
             <img src="logo.jpg" style="width:32px; height:32px; border-radius:8px;" onerror="this.style.display='none'">
             <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
         </div>
-        <span class="material-symbols-rounded" style="color:var(--prim); cursor:pointer; font-size:28px;">account_circle</span>
+        <span class="material-symbols-rounded" style="color:var(--prim); cursor:pointer;">account_circle</span>
     </header>
 
     <main id="store-grid" class="grid"></main>
@@ -53,16 +52,13 @@
                     <div class="card">
                         <img src="${file}" onerror="this.src='coming soon1.jpeg'">
                         <div style="padding:14px;">
-                            <div style="font-weight:700; font-size:13px; margin-bottom:8px;">${cleanName}</div>
+                            <div style="font-weight:700; font-size:13px; margin-bottom:10px;">${cleanName}</div>
                             <button class="btn-m3" onclick="ENGINE.add(${price})">Add - R${price}</button>
                         </div>
                     </div>`;
                 }).join('');
             },
-            add(price) {
-                this.total += price;
-                document.getElementById('bag-count').innerText = 'R' + this.total;
-            }
+            add(p) { this.total += p; document.getElementById('bag-count').innerText = 'R' + this.total; }
         };
         window.onload = () => ENGINE.init();
     </script>
