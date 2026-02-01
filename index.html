@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V270 Fixed</title>
+    <title>Otaku Beads | V271 Polish</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; overflow-x: hidden; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.85); backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .card { background: var(--card); border-radius: 24px; overflow: hidden; border: 1px solid var(--out); position: relative; }
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; }
+        header { position: sticky; top: 0; background: rgba(15,13,19,0.9); backdrop-filter: blur(25px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+        .card { background: var(--card); border-radius: 28px; overflow: hidden; border: 1px solid var(--out); transition: transform 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .card:active { transform: scale(0.96); }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; transition: background 0.3s; }
+        .btn-m3:active { background: #EADDFF; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); box-sizing: border-box; }
@@ -23,11 +25,11 @@
 </head>
 <body>
     <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img src="logo.jpg" style="width:32px; height:32px; border-radius:8px;" onerror="this.style.display='none'">
-            <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="logo.jpg" style="width:36px; height:36px; border-radius:10px;" onerror="this.style.display='none'">
+            <h1 style="font-size:20px; margin:0; letter-spacing:-0.5px;">Otaku Beads</h1>
         </div>
-        <div id="user-btn" onclick="UI.open('account')" style="width:36px; height:36px; border-radius:50%; background:var(--out); display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; border: 2px solid var(--prim);">
+        <div id="user-btn" onclick="UI.open('account')" style="width:38px; height:38px; border-radius:50%; background:var(--out); display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; border: 2px solid var(--prim);">
             <span class="material-symbols-rounded" style="color:var(--prim)">account_circle</span>
         </div>
     </header>
@@ -42,7 +44,7 @@
     <div id="account-overlay" class="sheet-overlay" onclick="UI.close('account')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="width:40px; height:4px; background:var(--out); border-radius:2px; margin:0 auto 20px;"></div>
-            <h2 id="user-name" style="margin:0 0 15px 0;">Customer Account</h2>
+            <h2 id="user-name" style="margin:0 0 15px 0;">Account</h2>
             <div id="google-anchor" style="margin-bottom:20px;"></div>
             <button class="btn-m3" style="background:var(--out); color:white;" onclick="UI.logout()">Sign Out</button>
         </div>
@@ -51,14 +53,14 @@
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="width:40px; height:4px; background:var(--out); border-radius:2px; margin:0 auto 20px;"></div>
-            <h2>Checkout (ZAR)</h2>
+            <h2 style="margin:0 0 10px 0;">Checkout</h2>
             <div style="background:rgba(255,255,255,0.05); border-radius:20px; padding:20px; margin-bottom:20px;">
-                <p style="margin:0 0 10px 0; font-weight:700;">#X Paxi Delivery</p>
-                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> No Delivery (Collect)</label>
-                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Paxi Standard - R60</label>
-                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Paxi Express - R100</label>
+                <p style="margin:0 0 12px 0; font-weight:700; color:var(--prim);">#X Paxi Delivery (ZAR)</p>
+                <label style="display:block; margin-bottom:12px; font-size:14px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> No Delivery (Collect) - R0</label>
+                <label style="display:block; margin-bottom:12px; font-size:14px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Paxi Standard - R60</label>
+                <label style="display:block; font-size:14px;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Paxi Express - R100</label>
             </div>
-            <button class="btn-m3" id="pay-btn" onclick="alert('Google processing order... ⚓')">Pay R0</button>
+            <button class="btn-m3" id="pay-btn" onclick="alert('Proceeding to secure checkout... ⚓')">Pay R0</button>
         </div>
     </div>
 
@@ -76,7 +78,16 @@
                 const grid = document.getElementById('store-grid');
                 grid.innerHTML = this.inventory.map(file => {
                     const price = file.toLowerCase().includes('keychain') ? 50 : 40;
-                    return `<div class="card"><img src="${file}" onerror="this.src='coming soon1.jpeg'" style="width:100%; aspect-ratio:1/1; object-fit:cover;"><div style="padding:15px;"><div style="font-weight:700; font-size:13px; margin-bottom:10px;">${file.split('_')[0]}</div><button class="btn-m3" onclick="ENGINE.add(${price})">Add R${price}</button></div></div>`;
+                    // POLISH: Strip extensions and underscores [cite: 2026-02-01]
+                    const cleanName = file.split('.')[0].replace(/_/g, ' ');
+                    return `
+                    <div class="card">
+                        <img src="${file}" onerror="this.src='coming soon1.jpeg'" style="width:100%; aspect-ratio:1/1; object-fit:cover;">
+                        <div style="padding:16px;">
+                            <div style="font-weight:700; font-size:14px; margin-bottom:12px; text-transform: capitalize;">${cleanName}</div>
+                            <button class="btn-m3" onclick="ENGINE.add(${price})">Add - R${price}</button>
+                        </div>
+                    </div>`;
                 }).join('');
                 
                 const saved = localStorage.getItem('user');
@@ -106,7 +117,7 @@
                 client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
                 callback: handleAuth
             });
-            google.accounts.id.renderButton(document.getElementById("google-anchor"), { theme: "outline", size: "large" });
+            google.accounts.id.renderButton(document.getElementById("google-anchor"), { theme: "filled_blue", size: "large", shape: "pill" });
             google.accounts.id.prompt(); 
         };
     </script>
