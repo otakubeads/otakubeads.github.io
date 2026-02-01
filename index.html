@@ -3,26 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V310 Restored</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Otaku Beads | V311 Identity Fix</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async onload="onGooglePayLoaded()"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --success: #B4E3A8; }
-        * { box-sizing: border-box; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
         header { position: sticky; top: 0; background: rgba(15,13,19,0.8); backdrop-filter: blur(24px); padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
-        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; position: relative; }
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 85vh; transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
-        .sheet-overlay.active .sheet-content { transform: translateY(0); }
-        .paxi-chip { background: var(--out); padding: 14px; border-radius: 16px; margin-bottom: 10px; border: 2px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-        .paxi-chip.active { border-color: var(--prim); background: var(--on-prim); }
-        #bag-fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 24px; font-weight: 800; border: none; z-index: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 85vh; padding: 24px; display: flex; flex-direction: column; }
+        #bag-fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 24px; font-weight: 800; border: none; display: flex; align-items: center; gap: 8px; z-index: 900; }
     </style>
 </head>
 <body onload="ENGINE.init()">
@@ -31,74 +27,68 @@
             <img src="logo.jpg" style="width:40px; height:40px; border-radius:12px;" onerror="this.style.display='none'">
             <h1 style="font-size:20px; margin:0;">Otaku Beads</h1>
         </div>
-        <div id="google-header-btn" style="min-width: 40px; height: 40px;">
-            </div>
+        <div id="g_id_btn"></div>
     </header>
 
     <main id="store-grid" class="grid"></main>
 
     <button id="bag-fab" onclick="UI.open('cart')">
-        <span class="material-symbols-rounded">shopping_bag</span>
-        <span id="bag-count">R0</span>
+        <span class="material-symbols-rounded">shopping_bag</span> <span id="bag-count">R0</span>
     </button>
 
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
-            <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0;">My Bag</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2 style="margin:0;">Bag</h2>
                 <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;">×</button>
             </div>
-            <div style="flex:1; overflow-y:auto; padding:0 24px;">
-                <div id="cart-list"></div>
-                <div style="margin:24px 0;">
-                    <p style="font-weight:700; color:var(--prim);">PAXI Delivery</p>
-                    <div class="paxi-chip active" id="p-0" onclick="ENGINE.setPaxi(0, 'Collection')">Collection (R0)</div>
-                    <div class="paxi-chip" id="p-60" onclick="ENGINE.setPaxi(60, 'Standard PAXI')">Standard (R60)</div>
-                    <div class="paxi-chip" id="p-100" onclick="ENGINE.setPaxi(100, 'Express PAXI')">Express (R100)</div>
-                </div>
-            </div>
-            <div style="padding:24px; border-top:1px solid var(--out); background:var(--sheet);">
+            <div id="cart-list" style="flex:1; overflow-y:auto;"></div>
+            <div style="padding-top:20px; border-top:1px solid var(--out);">
                 <div id="gpay-area"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:24px; color:var(--success); margin-top:16px;"><span>Total</span><span id="cart-total">R0</span></div>
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:24px; color:var(--success); margin-top:16px;">
+                    <span>Total</span><span id="cart-total">R0</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const UI = {
-            open(id) { document.getElementById(id + '-overlay').style.display = 'flex'; setTimeout(()=>document.getElementById(id + '-overlay').classList.add('active'),10); },
-            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); setTimeout(()=>document.getElementById(id + '-overlay').style.display = 'none',400); }
+            open(id) { document.getElementById(id + '-overlay').classList.add('active'); document.getElementById(id + '-overlay').style.display = 'flex'; },
+            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); setTimeout(() => document.getElementById(id + '-overlay').style.display = 'none', 300); }
         };
 
         const ENGINE = {
-            cart: {}, paxiPrice: 0, paxiName: 'Collection',
-            inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
+            cart: {}, inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             init() {
                 const grid = document.getElementById('store-grid');
                 grid.innerHTML = this.inventory.map(file => {
                     const price = file.includes('keychain') ? 50 : 40;
-                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${file.split('.')[0]}</b><br><span style="color:var(--prim)">R${price}</span><button class="btn-m3" style="margin-top:10px;" onclick="ENGINE.add('${file}',${price})">Add</button></div></div>`;
-                }).join('') + `<div class="card" style="opacity:0.6"><img src="26.jpg" style="width:100%"><div style="padding:16px;"><b>Design #26</b><br>Coming Soon</div></div>`;
-                this.syncGoogle();
-            },
-            syncGoogle() {
-                const user = JSON.parse(localStorage.getItem('user'));
-                if(user) {
-                    document.getElementById('google-header-btn').innerHTML = `<img src="${user.picture}" style="width:40px; height:40px; border-radius:20px; border:2px solid var(--prim);" onclick="if(confirm('Sign out?')){localStorage.clear();location.reload();}">`;
-                } else {
-                    google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: (r) => { localStorage.setItem('user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); } });
-                    google.accounts.id.renderButton(document.getElementById("google-header-btn"), { theme: "outline", size: "medium", shape: "pill" });
-                }
+                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${file.split('.')[0]}</b><br>R${price}<button class="btn-m3" style="margin-top:10px;" onclick="ENGINE.add('${file}',${price})">Add</button></div></div>`;
+                }).join('') + `<div class="card" style="opacity:0.5"><img src="26.jpg" style="width:100%"><div style="padding:16px;"><b>Design #26</b><br>Coming Soon</div></div>`;
+                
+                // FORCE GOOGLE BUTTON
+                window.onload = () => {
+                    google.accounts.id.initialize({
+                        client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
+                        callback: (r) => { localStorage.setItem('user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
+                    });
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    if(user) {
+                        document.getElementById('g_id_btn').innerHTML = `<img src="${user.picture}" style="width:40px; border-radius:20px; border:2px solid var(--prim)" onclick="if(confirm('Logout?')){localStorage.clear();location.reload();}">`;
+                    } else {
+                        google.accounts.id.renderButton(document.getElementById("g_id_btn"), { theme: "outline", size: "medium", shape: "pill" });
+                    }
+                };
             },
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
-            setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; document.querySelectorAll('.paxi-chip').forEach(c => c.classList.remove('active')); document.getElementById(`p-${p}`).classList.add('active'); this.update(); },
             update() {
                 let sub = 0; let items = '';
-                for(let n in this.cart) { sub += (this.cart[n].p * this.cart[n].qty); items += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${n.split('.')[0]} (x${this.cart[n].qty})</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`; }
-                this.total = sub + this.paxiPrice;
+                for(let n in this.cart) { sub += (this.cart[n].p * this.cart[n].qty); items += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${n.split('.')[0]} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`; }
                 document.getElementById('bag-count').innerText = 'R' + sub;
-                document.getElementById('cart-total').innerText = 'R' + this.total;
-                document.getElementById('cart-list').innerHTML = items || '<p style="text-align:center; opacity:0.5;">Bag empty</p>';
+                document.getElementById('cart-total').innerText = 'R' + sub;
+                document.getElementById('cart-list').innerHTML = items || 'Bag empty';
+                this.total = sub;
             }
         };
 
@@ -106,9 +96,8 @@
             const pc = new google.payments.api.PaymentsClient({environment: 'TEST'});
             const btn = pc.createButton({onClick: () => {
                 const user = JSON.parse(localStorage.getItem('user')) || {name: "Customer"};
-                let list = ""; for(let n in ENGINE.cart) { list += `📦 ${n.split('.')[0]} (x${ENGINE.cart[n].qty})\n`; }
-                const msg = `⚓ *ORDER RECEIVED*\n*Name:* ${user.name}\n*Items:*\n${list}\n*Delivery:* ${ENGINE.paxiName}\n*Total:* R${ENGINE.total}`;
-                window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`);
+                let list = ""; for(let n in ENGINE.cart) { list += `${n.split('.')[0]} (x${ENGINE.cart[n].qty})\n`; }
+                window.open(`https://wa.me/27663443753?text=${encodeURIComponent("⚓ ORDER\nName: "+user.name+"\nItems:\n"+list+"Total: R"+ENGINE.total)}`);
             }});
             document.getElementById('gpay-area').appendChild(btn);
         }
