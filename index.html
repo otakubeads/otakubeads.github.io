@@ -1,108 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V299 Official Line</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://pay.google.com/gp/p/js/pay.js" async onload="onGooglePayLoaded()"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
-    <style>
-        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --err: #F2B8B5; --on-err: #601410; --success: #B4E3A8; }
-        * { -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.8); backdrop-filter: blur(24px); padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
-        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
-        .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.15s; }
-        .btn-m3:active { transform: scale(0.94); }
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; opacity: 0; transition: 0.3s; }
-        .sheet-overlay.active { display: flex; opacity: 1; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 85vh; transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1.2); display: flex; flex-direction: column; }
-        .sheet-overlay.active .sheet-content { transform: translateY(0); }
-        .sheet-body { flex: 1; overflow-y: auto; padding: 0 24px; }
-        .sheet-footer { padding: 24px; border-top: 1px solid var(--out); }
-    </style>
-</head>
-<body>
-    <header>
-        <div style="display:flex; align-items:center; gap:12px;">
-            <img src="logo.jpg" style="width:40px; height:40px; border-radius:12px;" onerror="this.src='logo.jpg'">
-            <h1 style="font-size:22px; margin:0;">Otaku Beads</h1>
-        </div>
-        <div onclick="UI.open('account')" id="header-user-btn" style="width:44px; height:44px; border-radius:22px; background:var(--out); cursor:pointer; overflow:hidden; border: 2px solid var(--prim); display:flex; align-items:center; justify-content:center;">
-            <span class="material-symbols-rounded" style="color:var(--prim);">account_circle</span>
-        </div>
-    </header>
+<style>
+    .save-toggle { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--prim); cursor: pointer; }
+    .m3-chip-sm { padding: 6px 12px; border-radius: 8px; background: var(--out); font-size: 11px; font-weight: 700; }
+</style>
 
-    <main id="store-grid" class="grid"></main>
-
-    <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
-        <div class="sheet-content" onclick="event.stopPropagation()">
-            <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0;">Bag</h2>
-                <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;"><span class="material-symbols-rounded">close</span></button>
-            </div>
-            <div class="sheet-body">
-                <div id="cart-list"></div>
-                <div style="margin:24px 0; background:rgba(255,255,255,0.05); padding:16px; border-radius:20px;">
-                    <p style="font-weight:700; color:var(--prim); margin-top:0;">PAXI Delivery ⚓</p>
-                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collection (R0)</label>
-                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard (R60)</label>
-                    <label style="display:flex; align-items:center; gap:10px;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express (R100)</label>
+<div id="account-overlay" class="sheet-overlay" onclick="UI.close('account')">
+    <div class="sheet-content" onclick="event.stopPropagation()">
+        <div class="sheet-body">
+            <div id="logged-in-view" style="display:none;">
+                <div id="user-avatar-large"></div>
+                <h2 id="user-name-display"></h2>
+                
+                <div style="margin-top:32px; text-align:left; background:rgba(255,255,255,0.03); padding:20px; border-radius:24px;">
+                    <p style="font-weight:700; margin:0 0 12px 0;">Delivery Preferences ⚓</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span id="saved-paxi-label" style="opacity:0.7;">No saved PAXI point</span>
+                        <button onclick="ENGINE.clearSavedPaxi()" style="color:var(--err); background:none; border:none; font-size:12px;">Clear</button>
+                    </div>
                 </div>
-            </div>
-            <div class="sheet-footer">
-                <div id="gpay-container" style="margin-bottom:12px; height:48px;"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:24px; color:var(--success);"><span>Total</span><span id="final-total">R0</span></div>
+                
+                <button class="btn-m3" style="margin-top:32px; background:var(--out); color:var(--err);" onclick="UI.logout()">Sign Out</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        let paymentsClient = null;
-        const UI = {
-            open(id) { document.getElementById(id + '-overlay').style.display = 'flex'; setTimeout(() => document.getElementById(id + '-overlay').classList.add('active'), 10); },
-            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); setTimeout(() => document.getElementById(id + '-overlay').style.display = 'none', 400); }
-        };
-
-        const ENGINE = {
-            cart: {},
-            total: 0,
-            inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
-            init() {
-                const grid = document.getElementById('store-grid');
-                grid.innerHTML = this.inventory.map(file => {
-                    const price = file.includes('keychain') ? 50 : 40;
-                    const name = file.split('.')[0].replace(/_/g, ' ');
-                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><b>${name}</b><br><span style="color:var(--prim)">R${price}</span><button class="btn-m3" style="margin-top:10px;" onclick="ENGINE.add('${name}',${price})">Add</button></div></div>`;
-                }).join('');
-            },
-            add(name, price) { if(!this.cart[name]) this.cart[name] = { price, qty: 0 }; this.cart[name].qty++; this.update(); UI.open('cart'); },
-            update() {
-                let sub = 0; for(let n in this.cart) { sub += (this.cart[n].price * this.cart[n].qty); }
-                const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
-                this.total = sub + ship;
-                document.getElementById('final-total').innerText = 'R' + this.total;
-            },
-            sendWhatsApp() {
-                const user = JSON.parse(localStorage.getItem('user')) || { name: "Guest" };
-                const msg = `⚓ *Otaku Beads Order Confirmed* ⚓\n\n*Customer:* ${user.name}\n*Total:* R${this.total}\n\n_Payment processed via Google Pay_`;
-                window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`);
+<script>
+    const ENGINE = {
+        // ... previous logic ...
+        savedPaxi: localStorage.getItem('otaku_saved_paxi') || '',
+        
+        init() {
+            // ... inventory load ...
+            this.syncUser();
+            this.refreshSavedLabel();
+        },
+        
+        refreshSavedLabel() {
+            const label = document.getElementById('saved-paxi-label');
+            if(label) label.innerText = this.savedPaxi ? `Saved: ${this.savedPaxi}` : 'No saved PAXI point';
+            if(this.savedPaxi && document.getElementById('paxi-point-code')) {
+                document.getElementById('paxi-point-code').value = this.savedPaxi;
             }
-        };
+        },
 
-        function onGooglePayLoaded() {
-            paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-            const btn = paymentsClient.createButton({onClick: () => {
-                const req = { apiVersion: 2, apiVersionMinor: 0, allowedPaymentMethods: [{type: 'CARD', parameters: {allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["VISA", "MASTERCARD"]}, tokenizationSpecification: {type: 'PAYMENT_GATEWAY', parameters: {gateway: 'example', gatewayMerchantId: 'example'}}}], transactionInfo: {totalPriceStatus: 'FINAL', totalPrice: ENGINE.total.toString(), currencyCode: 'ZAR', countryCode: 'ZA'}, merchantInfo: {merchantName: 'Otaku Beads'} };
-                paymentsClient.loadPaymentData(req).then(() => ENGINE.sendWhatsApp());
-            }});
-            document.getElementById('gpay-container').appendChild(btn);
+        setPaxi(price, name) {
+            this.paxiPrice = price;
+            this.paxiName = name;
+            document.querySelectorAll('.paxi-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById(`paxi-${price}`).classList.add('active');
+            
+            const box = document.getElementById('paxi-code-box');
+            box.style.display = price === 0 ? 'none' : 'block';
+            
+            // Auto-fill if we have it
+            if(price !== 0 && this.savedPaxi) {
+                document.getElementById('paxi-point-code').value = this.savedPaxi;
+            }
+            this.update();
+        },
+
+        clearSavedPaxi() {
+            localStorage.removeItem('otaku_saved_paxi');
+            this.savedPaxi = '';
+            this.refreshSavedLabel();
+            alert("Delivery info cleared.");
+        },
+
+        sendWhatsApp() {
+            const codeInput = document.getElementById('paxi-point-code').value;
+            const shouldSave = document.getElementById('save-paxi-check')?.checked;
+            
+            if(shouldSave && codeInput) {
+                localStorage.setItem('otaku_saved_paxi', codeInput);
+                this.savedPaxi = codeInput;
+            }
+            
+            // ... WhatsApp message logic ...
         }
-
-        window.onload = () => ENGINE.init();
-    </script>
-</body>
-</html>
+    };
+</script>
