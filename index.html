@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V285 Clean</title>
+    <title>Otaku Beads | V287 Logistics</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
@@ -14,11 +14,13 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-out { background: var(--out); color: white; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0 24px 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .sheet-header { position: sticky; top: 0; background: var(--sheet); padding: 24px 0 16px; z-index: 101; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--out); }
+        .pay-chip-group { display: flex; gap: 8px; margin-top: 12px; }
+        .pay-chip { background: var(--out); padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1.5px solid transparent; }
+        .pay-chip.active { border-color: var(--prim); background: var(--on-prim); }
         .cart-item { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .cart-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; }
         #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; }
@@ -49,13 +51,11 @@
                 <button onclick="UI.close('account')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%;"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div id="auth-state-container" style="padding:24px 0; text-align:center;">
-                <div id="view-logged-out">
-                    <div id="google-login-anchor" style="display:flex; justify-content:center;"></div>
-                </div>
+                <div id="view-logged-out"><div id="google-login-anchor" style="display:flex; justify-content:center;"></div></div>
                 <div id="view-logged-in" style="display:none;">
                     <div id="user-profile-large" style="width:80px; height:80px; border-radius:50%; margin:0 auto 16px; border:3px solid var(--prim); overflow:hidden;"></div>
                     <h3 id="user-full-name" style="margin:0;">Guest</h3>
-                    <button class="btn-m3 btn-out" onclick="UI.logout()" style="color:var(--err); margin-top:20px;">Sign Out</button>
+                    <button class="btn-m3" onclick="UI.logout()" style="background:var(--out); color:var(--err); margin-top:20px;">Sign Out</button>
                 </div>
             </div>
         </div>
@@ -70,17 +70,34 @@
             <div id="cart-list"></div>
             
             <div style="background:rgba(255,255,255,0.05); border-radius:24px; padding:20px; margin:20px 0;">
-                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">Delivery Selection</p>
-                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collect - R0</label>
-                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Paxi Standard - R60</label>
-                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Paxi Express - R100</label>
+                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">PAXI Delivery Method</p>
+                <label style="display:flex; align-items:center; margin-bottom:14px; gap:10px;">
+                    <input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()">
+                    <span>Collect (Store) — R0</span>
+                </label>
+                <label style="display:flex; align-items:center; margin-bottom:14px; gap:10px;">
+                    <input type="radio" name="paxi" value="60" onchange="ENGINE.update()">
+                    <span>Standard (7-9 Business Days) — R60</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:10px;">
+                    <input type="radio" name="paxi" value="100" onchange="ENGINE.update()">
+                    <span>Express (3-5 Business Days) — R100</span>
+                </label>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.05); border-radius:24px; padding:20px; margin-bottom:20px;">
+                <p style="margin:0 0 4px 0; font-weight:700; color:var(--prim);">Payment Method</p>
+                <div class="pay-chip-group">
+                    <div class="pay-chip active">Credit/Debit</div>
+                    <div class="pay-chip">Instant EFT</div>
+                </div>
             </div>
 
             <div style="display:flex; justify-content:space-between; margin:20px 0; font-weight:700; font-size:20px; color:var(--success);">
                 <span>Grand Total</span><span id="final-total">R0</span>
             </div>
             <button class="btn-m3" onclick="ENGINE.processPayment()">
-                <span class="material-symbols-rounded">lock</span> Pay Now
+                <span class="material-symbols-rounded">shield_with_heart</span> Finalize & Pay
             </button>
         </div>
     </div>
@@ -101,8 +118,7 @@
                     const type = file.toLowerCase().includes('keychain') ? 'Keychain' : 'Bracelet';
                     const name = file.split('.')[0].replace(/_/g, ' ');
                     const price = type === 'Keychain' ? 50 : 40;
-                    // REMOVED TYPE LABEL FROM UI [cite: 2026-02-01]
-                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><div style="font-weight:700; text-transform:capitalize; margin-bottom:12px;">${name}</div><button class="btn-m3" onclick="ENGINE.add('${file}','${name}','${type}',${price})">Add R${price}</button></div></div>`;
+                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><div style="font-size:11px; color:var(--prim); font-weight:700; text-transform:uppercase; margin-bottom:4px;">${type}</div><div style="font-weight:700; text-transform:capitalize; margin-bottom:12px; font-size:14px;">${name}</div><button class="btn-m3" onclick="ENGINE.add('${file}','${name}','${type}',${price})">Add R${price}</button></div></div>`;
                 }).join('');
                 this.update();
                 this.checkAuth();
@@ -134,7 +150,7 @@
                 let sub = 0, html = '';
                 for(let n in this.cart) {
                     const i = this.cart[n]; sub += (i.price * i.qty);
-                    html += `<div class="cart-item"><img src="${i.file}" class="cart-img" onerror="this.src='coming soon1.jpeg'"><div style="flex:1;"><div style="font-weight:700; text-transform:capitalize;">${n}</div><div>R${i.price}</div></div><div style="display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:20px; padding:4px; gap:8px;"><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:700;">${i.qty}</span><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
+                    html += `<div class="cart-item"><img src="${i.file}" class="cart-img" onerror="this.src='coming soon1.jpeg'"><div style="flex:1;"><div style="font-size:11px; color:var(--prim); font-weight:700;">${i.type}</div><div style="font-weight:700; text-transform:capitalize;">${n}</div><div>R${i.price}</div></div><div style="display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:20px; padding:4px; gap:8px;"><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:700;">${i.qty}</span><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
                 }
                 const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
                 document.getElementById('bag-count').innerText = 'R' + sub;
@@ -144,7 +160,7 @@
             processPayment() {
                 const user = JSON.parse(localStorage.getItem('user'));
                 if(!user) { UI.open('account'); return; }
-                alert('Securely connecting to ZAR Payment Gateway... ⚓');
+                alert('Securely connecting to Google Payment Engine for Rand transaction... ⚓');
             }
         };
 
