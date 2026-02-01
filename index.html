@@ -10,51 +10,57 @@
         :root { --m3-p: #6750A4; --m3-s: #FEF7FF; --m3-o: #79747E; }
         body { font-family: 'Roboto', sans-serif; background: var(--m3-s); margin: 0; color: #1C1B1F; }
         .m3-top-bar { display: flex; align-items: center; padding: 12px 16px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .logo { height: 40px; margin-left: 16px; }
+        .logo { height: 40px; margin-left: 16px; border-radius: 50%; }
         .m3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 16px; }
         .m3-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #CAC4D0; }
-        .m3-card img { width: 100%; display: block; }
-        .coming-soon { filter: grayscale(1); opacity: 0.6; }
-        .m3-btn-disabled { background: #E1E2E1; color: #757575; border: none; padding: 10px; width: 100%; border-radius: 20px; font-weight: 500; cursor: not-allowed; }
-        
-        /* Section #X: PAXI Checkout */
+        .m3-card img { width: 100%; display: block; aspect-ratio: 1/1; object-fit: cover; }
+        .card-info { padding: 12px; text-align: center; }
         .checkout-section { padding: 24px; border-radius: 28px 28px 0 0; background: #fff; border-top: 1px solid var(--m3-o); margin-top: 20px; }
-        .paxi-card { border: 1px solid var(--m3-o); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .paxi-card { border: 1px solid var(--m3-o); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; }
         .zar::before { content: "R "; }
     </style>
 </head>
 <body>
     <header class="m3-top-bar">
-        <span class="material-icons-sharp" style="color:var(--m3-p); cursor:pointer;">menu</span>
+        <span class="material-icons-sharp" style="color:var(--m3-p);">menu</span>
         <img src="logo.jpg" alt="Otaku Beads" class="logo">
     </header>
 
-    <main class="m3-grid">
-        <div class="m3-card coming-soon">
-            <img src="26.jpg">
-            <div style="padding:12px">
-                <p style="margin:0; font-weight:500;">Design #26</p>
-                <button class="m3-btn-disabled" disabled>Coming Soon</button>
-            </div>
-        </div>
-    </main>
+    <main class="m3-grid" id="gallery-grid"></main>
 
     <section class="checkout-section">
-        <h3 style="margin-bottom:16px;">Delivery (PAXI)</h3>
+        <h3>Delivery (PAXI)</h3>
         <div class="paxi-card"><span>Standard (7-9 Days)</span><span class="zar">60.00</span></div>
         <div class="paxi-card"><span>Express (3-5 Days)</span><span class="zar">100.00</span></div>
-        
-        <div id="google-anchor" style="margin-top:24px; text-align:center;">
-             <p style="margin:0; color:var(--m3-p);">⚓ GOOGLE DOES ALL HEAVY DUTY LIFTING</p>
+        <div style="margin-top:24px; color:var(--m3-p); display:flex; align-items:center;">
+             <span class="material-icons-sharp" style="margin-right:8px;">anchor</span>
+             <p style="margin:0; font-size: 14px; font-weight:500;">GOOGLE DOES ALL HEAVY DUTY LIFTING</p>
         </div>
     </section>
 
     <script>
-        /** * OTAKU BRAIN MASTER SCRIPT
-         * BUG-FREE DEPLOY COMMAND:
+        const images = [
+            "Akane_keychain.jpg", "Bulma_bracelet.jpg", "Chi-Chi_bracelet.jpg", 
+            "Dengi_keychain.jpg", "Gojo_keychain.jpg", "Goku_bracelet.jpg", 
+            "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", 
+            "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", 
+            "Ranma_keychain.jpg", "Ryoga_keychain.jpg", "Ryomen_keychain.jpg", 
+            "Usopp.jpg", "Vageta_bracelet.jpg", "Yuta_keychain.jpg", "Zoro_bracelet.jpg"
+        ];
+        
+        const grid = document.getElementById('gallery-grid');
+        images.forEach(file => {
+            // Remove extension and underscores for clean display
+            const displayName = file.split('.')[0].replace(/_/g, ' ').replace('keychain', '').replace('bracelet', '');
+            const card = document.createElement('div');
+            card.className = 'm3-card';
+            card.innerHTML = `<img src="${file}"><div class="card-info"><p style="margin:0; font-weight:500;">${displayName}</p></div>`;
+            grid.appendChild(card);
+        });
+
+        /** * MASTER DEPLOY COMMAND:
          * git add index.html && git commit -m "Fix: Final M3 Expressive UI and PAXI Restoration" && git push origin main
          */
-        console.log("⚓ Otaku Beads Master Code v2.3 Live (ZAR).");
     </script>
 </body>
 </html>
