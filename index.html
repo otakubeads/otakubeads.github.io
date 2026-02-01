@@ -3,26 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | Bag</title>
+    <title>Otaku Beads | V281 Google Engine</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
-        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --surf: #1C1B1F; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
+        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
         
-        /* M3 FLOATING BAG ANCHOR */
-        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: pointer; }
+        /* Sticky UI Anchors */
+        header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; transition: transform 0.2s; }
+        .card:active { transform: scale(0.97); }
         
-        /* SECTION #X: PAXI M3 ELEMENTS */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; }
+        /* Bottom Sheets */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--prim); }
-        .paxi-card { background: var(--surf); border-radius: 24px; padding: 16px; margin: 16px 0; border: 1px solid var(--out); }
-        .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0 24px 24px; box-sizing: border-box; max-height: 85vh; overflow-y: auto; }
+        
+        /* STICKY HEADER FIX [cite: 2026-02-01] */
+        .sheet-header { position: sticky; top: 0; background: var(--sheet); padding: 24px 0 16px; z-index: 101; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--out); margin-bottom: 8px; }
+        
+        .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-out { background: var(--out); color: white; }
+        
+        .cart-item { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .cart-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 1px solid var(--out); }
+        
+        #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
+    <header>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="logo.jpg" style="width:36px; height:36px; border-radius:10px;" onerror="this.style.display='none'">
+            <h1 style="font-size:20px; margin:0;">Otaku Beads</h1>
+        </div>
+        <div id="user-anchor" onclick="UI.open('account')" style="width:38px; height:38px; border-radius:50%; background:var(--out); overflow:hidden; border: 2px solid var(--prim); cursor:pointer;">
+            <span class="material-symbols-rounded" style="color:var(--prim); font-size:38px;">account_circle</span>
+        </div>
+    </header>
+
+    <main id="store-grid" class="grid"></main>
 
     <button id="bag-home" onclick="UI.open('cart')">
         <span class="material-symbols-rounded">shopping_bag</span>
@@ -31,43 +54,104 @@
 
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
-            <h2 style="margin-top:0;">Your Bag</h2>
-            <div id="cart-list" style="min-height: 50px;"></div>
-            
-            <div class="paxi-card">
-                <p style="margin-top:0; font-weight:700; color:var(--prim);">PAXI Delivery Options (ZAR)</p>
-                <label style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collect (R0)
-                </label>
-                <label style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard - 7-9 Days (R60)
-                </label>
-                <label style="display:flex; align-items:center; gap:12px;">
-                    <input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express - 3-5 Days (R100)
-                </label>
+            <div class="sheet-header">
+                <h2 style="margin:0;">Bag</h2>
+                <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
             </div>
+            <div id="cart-list"></div>
+            <div style="background:rgba(255,255,255,0.05); border-radius:24px; padding:20px; margin:20px 0;">
+                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">Paxi Delivery (ZAR)</p>
+                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collect - R0</label>
+                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard - R60</label>
+                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express - R100</label>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:700; font-size:18px;">
+                <span>Total</span><span id="final-total">R0</span>
+            </div>
+            <button class="btn-m3" onclick="ENGINE.checkout()">Complete Order</button>
+        </div>
+    </div>
 
-            <div style="display:flex; justify-content:space-between; padding:20px 0; font-size:20px; font-weight:700;">
-                <span>Total</span><span id="final-total" style="color:var(--prim);">R0</span>
+    <div id="account-overlay" class="sheet-overlay" onclick="UI.close('account')">
+        <div class="sheet-content" onclick="event.stopPropagation()">
+            <div class="sheet-header">
+                <h2 id="user-display-name">Account</h2>
+                <button onclick="UI.close('account')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
             </div>
-            <button class="btn-m3" onclick="ENGINE.checkout()">Complete Order ⚓</button>
+            <div id="google-login-btn" style="padding:20px 0;"></div>
+            <button class="btn-m3 btn-out" onclick="UI.logout()">Sign Out</button>
         </div>
     </div>
 
     <script>
         const UI = {
             open(id) { document.getElementById(id + '-overlay').classList.add('active'); },
-            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); }
+            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); },
+            logout() { localStorage.clear(); location.reload(); }
         };
+
         const ENGINE = {
-            cart: {},
+            cart: JSON.parse(localStorage.getItem('otaku_cart_v2') || '{}'),
+            inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vageta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
+            init() {
+                const grid = document.getElementById('store-grid');
+                grid.innerHTML = this.inventory.map(file => {
+                    const type = file.toLowerCase().includes('keychain') ? 'Keychain' : 'Bracelet';
+                    const name = file.split('.')[0].replace(/_/g, ' ');
+                    const price = type === 'Keychain' ? 50 : 40;
+                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><div style="font-size:11px; color:var(--prim); font-weight:700;">${type}</div><div style="font-weight:700; text-transform:capitalize;">${name}</div><button class="btn-m3" style="margin-top:12px;" onclick="ENGINE.add('${file}','${name}','${type}',${price})">Add R${price}</button></div></div>`;
+                }).join('');
+                this.update();
+                this.syncGoogle();
+            },
+            syncGoogle() {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if(user) {
+                    document.getElementById('user-display-name').innerText = user.name;
+                    document.getElementById('user-anchor').innerHTML = `<img src="${user.picture}" style="width:100%">`;
+                }
+            },
+            add(file, name, type, price) {
+                if(!this.cart[name]) this.cart[name] = { file, type, price, qty: 0 };
+                this.cart[name].qty++;
+                this.update();
+            },
+            changeQty(name, delta) {
+                if(this.cart[name]) {
+                    this.cart[name].qty += delta;
+                    if(this.cart[name].qty <= 0) delete this.cart[name];
+                    this.update();
+                }
+            },
             update() {
-                let sub = 0;
+                localStorage.setItem('otaku_cart_v2', JSON.stringify(this.cart));
+                let sub = 0, html = '';
+                for(let n in this.cart) {
+                    const i = this.cart[n]; sub += (i.price * i.qty);
+                    html += `<div class="cart-item"><img src="${i.file}" class="cart-img" onerror="this.src='coming soon1.jpeg'"><div style="flex:1;"><div style="font-size:10px; font-weight:700; color:var(--prim);">${i.type}</div><div style="font-weight:700; text-transform:capitalize;">${n}</div><div>R${i.price}</div></div><div style="display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:20px; padding:4px; gap:8px;"><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:700; min-width:16px; text-align:center;">${i.qty}</span><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
+                }
                 const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
                 document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('final-total').innerText = 'R' + (sub + ship);
+                document.getElementById('cart-list').innerHTML = html || '<p style="text-align:center; padding:40px; color:#888;">Bag is empty</p>';
             },
-            checkout() { alert("Google Cloud linking order... ⚓"); }
+            checkout() { alert('Google Cloud linking order... ⚓'); }
+        };
+
+        function handleCredentialResponse(response) {
+            const user = JSON.parse(atob(response.credential.split('.')[1]));
+            localStorage.setItem('user', JSON.stringify(user));
+            location.reload();
+        }
+
+        window.onload = () => {
+            ENGINE.init();
+            google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: handleCredentialResponse });
+            google.accounts.id.renderButton(document.getElementById("google-login-btn"), { theme: "filled_blue", size: "large", shape: "pill" });
         };
     </script>
 </body>
