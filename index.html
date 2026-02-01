@@ -3,157 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V284 Protected</title>
+    <title>Otaku Beads | Inventory</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --surf: #1C1B1F; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
+
+        header { position: sticky; top: 0; background: rgba(15, 13, 19, 0.85); backdrop-filter: blur(20px); padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.9); backdrop-filter: blur(15px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
+        /* GRID & CARDS SECTION #2 */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-        .card { background: var(--card); border-radius: 24px; border: 1px solid var(--out); overflow: hidden; position: relative; }
+        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; display: flex; flex-direction: column; }
+        .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-body { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
         
-        /* SECTION #R: GATED REVIEWS */
-        #reviews-container { display: none; padding: 20px; background: var(--surf); margin: 12px; border-radius: 28px; border: 1px solid var(--out); animation: slideUp 0.4s ease-out; }
-        .review-chip { background: var(--sheet); padding: 12px; border-radius: 20px; margin-bottom: 10px; border-left: 4px solid var(--prim); }
-        
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; }
-        .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--prim); }
-        
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-m3 { 
+            height: 48px; border-radius: 24px; border: none; font-weight: 700; 
+            background: var(--prim); color: var(--on-prim); cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; margin-top: 12px;
+        }
+        .btn-disabled { background: var(--out); color: #888; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <header>
         <div style="display:flex; align-items:center; gap:12px;">
-            <img src="logo.jpg" style="width:40px; height:40px; border-radius:12px; border:1px solid var(--prim);" onerror="this.style.display='none'">
-            <h1 style="font-size:18px; margin:0;">OTAKU BEADS</h1>
+            <img src="logo.jpg" style="width:42px; height:42px; border-radius:14px; border:1.5px solid var(--prim);" onerror="this.style.display='none'">
+            <h1 style="font-size:18px; margin:0;">Otaku Beads</h1>
         </div>
-        <div id="user-anchor" onclick="UI.open('account')" style="width:40px; height:40px; border-radius:50%; background:var(--out); overflow:hidden; border: 2px solid var(--prim); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+        <div id="user-anchor" style="width:44px; height:44px; border-radius:50%; background:var(--sheet); border:2px solid var(--out); overflow:hidden; display:flex; align-items:center; justify-content:center;">
             <span class="material-symbols-rounded">account_circle</span>
         </div>
     </header>
 
     <main id="store-grid" class="grid"></main>
 
-    <div id="reviews-container">
-        <h3 style="margin-top:0; display:flex; align-items:center; gap:8px;">
-            <span class="material-symbols-rounded" style="color:var(--prim)">verified_user</span>
-            Verified Reviews
-        </h3>
-        <div class="review-chip">
-            <div style="color:#FFB400;">★★★★★</div>
-            <div style="font-size:13px; font-weight:700;">"Google Login makes it so easy to track my orders!"</div>
-            <div style="font-size:11px; opacity:0.6;">— Jaden L.</div>
-        </div>
-        <button class="btn-m3" style="background:var(--out); color:white; height:36px; font-size:12px;">Add Verified Review</button>
-    </div>
-
-    <button id="bag-home" style="position:fixed; bottom:24px; right:20px; background:var(--prim); color:var(--on-prim); padding:16px 24px; border-radius:28px; z-index:999; font-weight:700; border:none; display:flex; align-items:center; gap:10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);" onclick="UI.open('cart')">
-        <span class="material-symbols-rounded">shopping_cart</span>
-        <span id="bag-count">R0</span>
-    </button>
-
-    <div id="account-overlay" class="sheet-overlay" onclick="UI.close('account')">
-        <div class="sheet-content" onclick="event.stopPropagation()">
-            <h2 id="user-display-name">Sign In</h2>
-            <p id="auth-status-msg" style="font-size:14px; opacity:0.7;">Sign in to view verified reviews and your bead history.</p>
-            <div id="google-login-btn"></div>
-            <button class="btn-m3" style="margin-top:20px; background:var(--out); color:white;" onclick="UI.logout()">Logout</button>
-        </div>
-    </div>
-
-    <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
-        <div class="sheet-content" onclick="event.stopPropagation()">
-            <h2>Your Bag</h2>
-            <div id="cart-list"></div>
-            <div style="background:var(--surf); border-radius:28px; padding:20px; margin:16px 0; border:1px solid var(--out);">
-                <p style="margin-top:0; font-weight:700; color:var(--prim);">PAXI Delivery (ZAR)</p>
-                <label style="display:block; margin-bottom:10px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collect (R0)</label>
-                <label style="display:block; margin-bottom:10px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> PAXI Standard (R60)</label>
-                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> PAXI Express (R100)</label>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:20px 0; font-size:20px; font-weight:700;">
-                <span>Total</span><span id="final-total" style="color:var(--prim);">R0</span>
-            </div>
-            <button class="btn-m3" onclick="ENGINE.checkout()">Complete Order ⚓</button>
-        </div>
-    </div>
-
     <script>
-        const UI = {
-            open(id) { document.getElementById(id + '-overlay').classList.add('active'); },
-            close(id) { document.getElementById(id + '-overlay').classList.remove('active'); },
-            logout() { localStorage.removeItem('otaku_user'); location.reload(); }
-        };
-
         const ENGINE = {
-            cart: JSON.parse(localStorage.getItem('otaku_cart_v2') || '{}'),
+            // YOUR AUTHENTIC INVENTORY
+            inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vageta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
+            
             init() {
                 const grid = document.getElementById('store-grid');
-                let items = "";
-                for(let i=1; i<=28; i++) {
-                    const isComingSoon = (i === 26);
-                    const name = isComingSoon ? "Design #26" : `Design #${i}`;
-                    const price = i % 2 === 0 ? 50 : 40;
-                    items += `
+                let html = "";
+
+                for(let i = 1; i <= 28; i++) {
+                    let file, name, price;
+                    const isDesign26 = (i === 26);
+
+                    // Pull from real inventory first
+                    if (this.inventory[i-1]) {
+                        file = this.inventory[i-1];
+                        name = file.split('.')[0].replace(/_/g, ' ');
+                        price = file.toLowerCase().includes('keychain') ? 50 : 40;
+                    } else {
+                        file = `${i}.jpg`;
+                        name = `Bead Design #${i}`;
+                        price = 45;
+                    }
+
+                    html += `
                     <div class="card">
-                        <img src="${i}.jpg" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'">
-                        <div style="padding:12px;">
-                            <div style="font-weight:700; font-size:14px;">${name}</div>
-                            <div style="margin-bottom:8px; color:var(--prim); font-weight:700;">R${price}</div>
-                            ${isComingSoon ? `<button class="btn-m3" style="background:#333; color:#888;" disabled>Coming Soon</button>` : `<button class="btn-m3" onclick="ENGINE.add('${name}',${price})">Add</button>`}
+                        <img src="${file}" class="card-img" onerror="this.src='coming soon1.jpeg'">
+                        <div class="card-body">
+                            <span style="font-size:10px; color:var(--prim); font-weight:700; text-transform:uppercase;">${file.includes('keychain') ? 'Keychain' : 'Bracelet'}</span>
+                            <span style="font-weight:700; text-transform:capitalize;">${isDesign26 ? 'Design #26' : name}</span>
+                            <span style="font-size:18px; font-weight:700; margin-top:4px;">R${price}</span>
+                            ${isDesign26 ? 
+                                `<button class="btn-m3 btn-disabled" disabled>Coming Soon</button>` : 
+                                `<button class="btn-m3" onclick="alert('Added to bag!')">Add to Bag</button>`
+                            }
                         </div>
                     </div>`;
                 }
-                grid.innerHTML = items;
-                this.checkAuth();
-                this.update();
-            },
-            checkAuth() {
-                const user = JSON.parse(localStorage.getItem('otaku_user'));
-                if(user) {
-                    document.getElementById('reviews-container').style.display = 'block';
-                    document.getElementById('user-display-name').innerText = "Hi, " + user.name;
-                    document.getElementById('auth-status-msg').innerText = "Verified Customer ⚓";
-                    document.getElementById('user-anchor').innerHTML = `<img src="${user.picture}" style="width:100%">`;
-                }
-            },
-            add(name, price) {
-                if(!this.cart[name]) this.cart[name] = { price, qty: 0 };
-                this.cart[name].qty++;
-                this.update();
-            },
-            update() {
-                localStorage.setItem('otaku_cart_v2', JSON.stringify(this.cart));
-                let sub = 0;
-                for(let n in this.cart) sub += (this.cart[n].price * this.cart[n].qty);
-                const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
-                document.getElementById('bag-count').innerText = 'R' + sub;
-                document.getElementById('final-total').innerText = 'R' + (sub + ship);
-            },
-            checkout() { alert("Google Cloud linking order... ⚓"); }
+                grid.innerHTML = html;
+            }
         };
 
-        function handleCredentialResponse(response) {
-            const user = JSON.parse(atob(response.credential.split('.')[1]));
-            localStorage.setItem('otaku_user', JSON.stringify(user));
-            location.reload();
-        }
-
-        window.onload = () => {
-            ENGINE.init();
-            google.accounts.id.initialize({ 
-                client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", 
-                callback: handleCredentialResponse 
-            });
-            google.accounts.id.renderButton(document.getElementById("google-login-btn"), { theme: "filled_blue", shape: "pill", size: "large" });
-        };
+        window.onload = () => ENGINE.init();
     </script>
 </body>
 </html>
