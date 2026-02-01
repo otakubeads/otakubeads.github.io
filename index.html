@@ -8,23 +8,17 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <style>
         :root { --m3-p: #D0BCFF; --m3-s: #1C1B1F; --m3-on-s: #E6E1E5; --m3-sec: #49454F; }
-        body { font-family: 'Roboto', sans-serif; background: var(--m3-s); margin: 0; color: var(--m3-on-s); padding-bottom: 80px; }
-        
-        .m3-top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #25232A; position: sticky; top: 0; z-index: 100; }
+        body { font-family: 'Roboto', sans-serif; background: var(--m3-s); margin: 0; color: var(--m3-on-s); padding-bottom: 24px; }
+        .m3-top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #25232A; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--m3-sec); }
         .logo { height: 32px; width: 32px; border-radius: 50%; border: 1px solid var(--m3-p); }
-        
         .m3-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
-        .m3-card { background: #2D2B30; border-radius: 24px; overflow: hidden; border: 1px solid var(--m3-sec); }
-        .m3-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .card-info { padding: 16px; }
-        .m3-btn { background: var(--m3-p); color: #381E72; border: none; padding: 10px; border-radius: 20px; font-weight: 500; width: 100%; }
-
-        /* Section #X: PAXI */
-        .checkout-sheet { background: #25232A; border-radius: 28px 28px 0 0; padding: 24px; border-top: 1px solid var(--m3-sec); }
-        .paxi-row { border: 1px solid var(--m3-sec); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; }
-        
-        /* Section #Z: Auto-Deploy FAB */
-        .deploy-fab { position: fixed; bottom: 20px; right: 20px; background: #381E72; color: var(--m3-p); border: 1px solid var(--m3-p); padding: 12px 20px; border-radius: 16px; display: flex; align-items: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; z-index: 200; }
+        .m3-card { background: #2D2B30; border-radius: 24px; overflow: hidden; border: 1px solid var(--m3-sec); display: flex; flex-direction: column; }
+        .m3-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #25232A; }
+        .card-info { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .m3-btn { background: var(--m3-p); color: #381E72; border: none; padding: 10px; border-radius: 20px; font-weight: 500; cursor: pointer; margin-top: 8px; }
+        .checkout-sheet { background: #25232A; border-radius: 28px 28px 0 0; padding: 24px; border-top: 1px solid var(--m3-sec); margin-top: 20px; }
+        .paxi-row { border: 1px solid var(--m3-sec); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .coming-soon { opacity: 0.5; filter: grayscale(1); }
     </style>
 </head>
 <body>
@@ -37,43 +31,44 @@
         <span class="material-icons-sharp">account_circle</span>
     </header>
 
-    <main class="m3-grid" id="product-grid"></main>
+    <main class="m3-grid" id="store-grid"></main>
 
     <section class="checkout-sheet">
-        <h3 style="color:var(--m3-p);">#X Paxi Delivery (ZAR)</h3>
-        <div class="paxi-row"><span>Standard</span><span>R 60.00</span></div>
-        <div class="paxi-row"><span>Express</span><span>R 100.00</span></div>
+        <h3 style="color:var(--m3-p); margin-top:0;">#X Paxi Delivery (ZAR)</h3>
+        <div class="paxi-row"><span>No Delivery (Collect)</span><span>R 0</span></div>
+        <div class="paxi-row"><span>Paxi Standard (7-9 Days)</span><span>R 60</span></div>
+        <div class="paxi-row"><span>Paxi Express (3-5 Days)</span><span>R 100</span></div>
         <div style="display:flex; align-items:center; gap:8px; color:var(--m3-p); font-size:12px; margin-top:16px;">
              <span class="material-icons-sharp" style="font-size:16px;">anchor</span>
-             <span>GOOGLE DOES ALL HEAVY DUTY LIFTING</span> </div>
+             <span>GOOGLE DOES ALL HEAVY DUTY LIFTING</span>
+        </div>
     </section>
-
-    <div class="deploy-fab" onclick="copyDeploy()">
-        <span class="material-icons-sharp">rocket_launch</span>
-        <span>Copy Git Command</span>
-    </div>
 
     <script>
         const inventory = [
-            { id: "Akane", file: "Akane_keychain.jpg", price: 50 },
-            { id: "Bulma", file: "Bulma_bracelet.jpg", price: 40 },
-            { id: "Zoro", file: "Zoro_bracelet.jpg", price: 40 }
+            "Akane_keychain.jpg", "Bulma_bracelet.jpg", "Chi-Chi_bracelet.jpg", 
+            "Dengi_keychain.jpg", "Gojo_keychain.jpg", "Goku_bracelet.jpg", 
+            "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", 
+            "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", 
+            "Ranma_keychain.jpg", "Ryoga_keychain.jpg", "Ryomen_keychain.jpg", 
+            "Usopp.jpg", "Vageta_bracelet.jpg", "Yuta_keychain.jpg", "Zoro_bracelet.jpg"
         ];
 
-        const grid = document.getElementById('product-grid');
-        inventory.forEach(item => {
+        const grid = document.getElementById('store-grid');
+        inventory.forEach(file => {
+            const isKeychain = file.toLowerCase().includes('keychain');
+            const price = isKeychain ? 50 : 40;
+            const name = file.split('.')[0].replace(/_/g, ' ').replace('keychain', '').replace('bracelet', '');
             const card = document.createElement('div');
             card.className = 'm3-card';
-            card.innerHTML = `<img src="${item.file}"><div class="card-info"><div style="margin-bottom:8px;">${item.id}</div><button class="m3-btn">Add - R${item.price}</button></div>`;
+            card.innerHTML = `<img src="${file}"><div class="card-info"><div style="font-weight:500;">${name}</div><button class="m3-btn">Add - R${price}</button></div>`;
             grid.appendChild(card);
         });
 
-        // The Automation Logic
-        function copyDeploy() {
-            const cmd = 'git add index.html && git commit -m "Fix: Final M3 Expressive UI and PAXI Restoration" && git push origin main';
-            navigator.clipboard.writeText(cmd);
-            alert("Git Command Copied! Just paste and enter in Termux.");
-        }
+        const d26 = document.createElement('div');
+        d26.className = 'm3-card coming-soon';
+        d26.innerHTML = `<img src="26.jpg"><div class="card-info"><div>Design #26</div><button class="m3-btn" style="background:#49454F;color:#938F99;" disabled>Coming Soon</button></div>`;
+        grid.appendChild(d26);
     </script>
 </body>
 </html>
