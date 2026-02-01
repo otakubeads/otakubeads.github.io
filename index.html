@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | GPay Active</title>
+    <title>Otaku Beads | V299 Official Line</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async onload="onGooglePayLoaded()"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -13,7 +13,10 @@
         * { -webkit-tap-highlight-color: transparent; outline: none; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
         header { position: sticky; top: 0; background: rgba(15,13,19,0.8); backdrop-filter: blur(24px); padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
-        .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+        .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
+        .btn-m3 { height: 52px; border-radius: 26px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.15s; }
+        .btn-m3:active { transform: scale(0.94); }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: flex-end; opacity: 0; transition: 0.3s; }
         .sheet-overlay.active { display: flex; opacity: 1; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 85vh; transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1.2); display: flex; flex-direction: column; }
@@ -25,7 +28,7 @@
 <body>
     <header>
         <div style="display:flex; align-items:center; gap:12px;">
-            <img src="logo.jpg" style="width:40px; height:40px; border-radius:12px;" onerror="this.style.display='none'">
+            <img src="logo.jpg" style="width:40px; height:40px; border-radius:12px;" onerror="this.src='logo.jpg'">
             <h1 style="font-size:22px; margin:0;">Otaku Beads</h1>
         </div>
         <div onclick="UI.open('account')" id="header-user-btn" style="width:44px; height:44px; border-radius:22px; background:var(--out); cursor:pointer; overflow:hidden; border: 2px solid var(--prim); display:flex; align-items:center; justify-content:center;">
@@ -33,7 +36,7 @@
         </div>
     </header>
 
-    <main id="store-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; padding:16px;"></main>
+    <main id="store-grid" class="grid"></main>
 
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
@@ -43,11 +46,11 @@
             </div>
             <div class="sheet-body">
                 <div id="cart-list"></div>
-                <div style="margin:24px 0;">
-                    <p style="font-weight:700; color:var(--prim);">Delivery Method</p>
-                    <label style="display:flex; gap:12px; margin-bottom:10px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collection (R0)</label>
-                    <label style="display:flex; gap:12px; margin-bottom:10px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard PAXI (R60)</label>
-                    <label style="display:flex; gap:12px; margin-bottom:10px;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express PAXI (R100)</label>
+                <div style="margin:24px 0; background:rgba(255,255,255,0.05); padding:16px; border-radius:20px;">
+                    <p style="font-weight:700; color:var(--prim); margin-top:0;">PAXI Delivery ⚓</p>
+                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collection (R0)</label>
+                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard (R60)</label>
+                    <label style="display:flex; align-items:center; gap:10px;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express (R100)</label>
                 </div>
             </div>
             <div class="sheet-footer">
@@ -58,14 +61,7 @@
     </div>
 
     <script>
-        // GPAY CORE LOGIC [cite: 2026-02-02]
         let paymentsClient = null;
-        const baseRequest = { apiVersion: 2, apiVersionMinor: 0 };
-        const allowedCardNetworks = ["MASTERCARD", "VISA"];
-        const allowedCardAuthMethods = ["PAN_ONLY", "CRYPTOGRAM_3DS"];
-        const baseCardPaymentMethod = { type: 'CARD', parameters: { allowedAuthMethods: allowedCardAuthMethods, allowedCardNetworks: allowedCardNetworks }};
-        const cardPaymentMethod = Object.assign({tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'exampleGatewayMerchantId' }}}, baseCardPaymentMethod);
-
         const UI = {
             open(id) { document.getElementById(id + '-overlay').style.display = 'flex'; setTimeout(() => document.getElementById(id + '-overlay').classList.add('active'), 10); },
             close(id) { document.getElementById(id + '-overlay').classList.remove('active'); setTimeout(() => document.getElementById(id + '-overlay').style.display = 'none', 400); }
@@ -73,39 +69,37 @@
 
         const ENGINE = {
             cart: {},
-            currentTotal: 0,
+            total: 0,
             inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             init() {
                 const grid = document.getElementById('store-grid');
                 grid.innerHTML = this.inventory.map(file => {
                     const price = file.includes('keychain') ? 50 : 40;
-                    return `<div style="background:var(--card); border-radius:28px; padding:16px; border:1px solid var(--out);"><img src="${file}" style="width:100%; border-radius:16px; margin-bottom:12px;" onerror="this.src='coming soon1.jpeg'"><div><b>${file.split('.')[0]}</b><br>R${price}</div><button class="btn-m3" style="margin-top:12px;" onclick="ENGINE.add('${file}',${price})">Add</button></div>`;
+                    const name = file.split('.')[0].replace(/_/g, ' ');
+                    return `<div class="card"><img src="${file}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='coming soon1.jpeg'"><div style="padding:16px;"><b>${name}</b><br><span style="color:var(--prim)">R${price}</span><button class="btn-m3" style="margin-top:10px;" onclick="ENGINE.add('${name}',${price})">Add</button></div></div>`;
                 }).join('');
             },
-            add(name, price) { if(!this.cart[name]) this.cart[name] = { price, qty: 0 }; this.cart[name].qty++; this.update(); },
+            add(name, price) { if(!this.cart[name]) this.cart[name] = { price, qty: 0 }; this.cart[name].qty++; this.update(); UI.open('cart'); },
             update() {
                 let sub = 0; for(let n in this.cart) { sub += (this.cart[n].price * this.cart[n].qty); }
                 const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
-                this.currentTotal = sub + ship;
-                document.getElementById('final-total').innerText = 'R' + this.currentTotal;
-                UI.open('cart');
+                this.total = sub + ship;
+                document.getElementById('final-total').innerText = 'R' + this.total;
+            },
+            sendWhatsApp() {
+                const user = JSON.parse(localStorage.getItem('user')) || { name: "Guest" };
+                const msg = `⚓ *Otaku Beads Order Confirmed* ⚓\n\n*Customer:* ${user.name}\n*Total:* R${this.total}\n\n_Payment processed via Google Pay_`;
+                window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`);
             }
         };
 
         function onGooglePayLoaded() {
             paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-            paymentsClient.isReadyToPay(Object.assign({}, baseRequest, {allowedPaymentMethods: [baseCardPaymentMethod]}))
-                .then(r => { if(r.result) { const btn = paymentsClient.createButton({onClick: onGPayClick, buttonColor: 'black', buttonType: 'buy'}); document.getElementById('gpay-container').appendChild(btn); }});
-        }
-
-        function onGPayClick() {
-            const paymentDataRequest = Object.assign({}, baseRequest);
-            paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod];
-            paymentDataRequest.transactionInfo = { totalPriceStatus: 'FINAL', totalPrice: ENGINE.currentTotal.toString(), currencyCode: 'ZAR', countryCode: 'ZA' };
-            paymentDataRequest.merchantInfo = { merchantName: 'Otaku Beads' };
-            paymentsClient.loadPaymentData(paymentDataRequest).then(data => { 
-                window.open(`https://wa.me/27763135069?text=Order%20Confirmed!%20Total:%20R${ENGINE.currentTotal}`);
-            });
+            const btn = paymentsClient.createButton({onClick: () => {
+                const req = { apiVersion: 2, apiVersionMinor: 0, allowedPaymentMethods: [{type: 'CARD', parameters: {allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["VISA", "MASTERCARD"]}, tokenizationSpecification: {type: 'PAYMENT_GATEWAY', parameters: {gateway: 'example', gatewayMerchantId: 'example'}}}], transactionInfo: {totalPriceStatus: 'FINAL', totalPrice: ENGINE.total.toString(), currencyCode: 'ZAR', countryCode: 'ZA'}, merchantInfo: {merchantName: 'Otaku Beads'} };
+                paymentsClient.loadPaymentData(req).then(() => ENGINE.sendWhatsApp());
+            }});
+            document.getElementById('gpay-container').appendChild(btn);
         }
 
         window.onload = () => ENGINE.init();
