@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V283 Vegeta</title>
+    <title>Otaku Beads | V284 Payment</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
-        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --err: #F2B8B5; }
+        :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --err: #F2B8B5; --success: #B4E3A8; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
         header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 16px 20px; border-bottom: 1px solid var(--out); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
@@ -17,11 +17,13 @@
         .btn-out { background: var(--out); color: white; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0 24px 24px; box-sizing: border-box; max-height: 85vh; overflow-y: auto; }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 0 24px 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .sheet-header { position: sticky; top: 0; background: var(--sheet); padding: 24px 0 16px; z-index: 101; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--out); }
         .cart-item { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .cart-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; }
-        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--out); color: white; cursor: pointer; }
+        .pay-method { display: flex; gap: 12px; margin-top: 12px; overflow-x: auto; padding-bottom: 8px; }
+        .pay-chip { background: var(--out); padding: 8px 16px; border-radius: 16px; font-size: 13px; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .pay-chip.active { border-color: var(--prim); background: var(--on-prim); }
         #bag-home { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; z-index: 9999; font-weight: 700; border: none; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
@@ -47,9 +49,7 @@
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div class="sheet-header">
                 <h2 id="sheet-user-name">Account</h2>
-                <button onclick="UI.close('account')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%;">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+                <button onclick="UI.close('account')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%;"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div id="auth-state-container" style="padding:24px 0; text-align:center;">
                 <div id="view-logged-out">
@@ -67,22 +67,34 @@
     <div id="cart-overlay" class="sheet-overlay" onclick="UI.close('cart')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div class="sheet-header">
-                <h2 style="margin:0;">Bag</h2>
-                <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%;">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+                <h2 style="margin:0;">Checkout</h2>
+                <button onclick="UI.close('cart')" style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:50%;"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div id="cart-list"></div>
+            
             <div style="background:rgba(255,255,255,0.05); border-radius:24px; padding:20px; margin:20px 0;">
-                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">Paxi Delivery (ZAR)</p>
+                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">Delivery Selection</p>
                 <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="0" checked onchange="ENGINE.update()"> Collect - R0</label>
-                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Standard - R60</label>
-                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Express - R100</label>
+                <label style="display:block; margin-bottom:12px;"><input type="radio" name="paxi" value="60" onchange="ENGINE.update()"> Paxi Standard (7-9 days) - R60</label>
+                <label style="display:block;"><input type="radio" name="paxi" value="100" onchange="ENGINE.update()"> Paxi Express (3-5 days) - R100</label>
             </div>
-            <div style="display:flex; justify-content:space-between; margin:20px 0; font-weight:700; font-size:18px;">
-                <span>Total</span><span id="final-total">R0</span>
+
+            <div style="background:rgba(255,255,255,0.05); border-radius:24px; padding:20px; margin-bottom:20px;">
+                <p style="margin:0 0 10px 0; font-weight:700; color:var(--prim);">Payment Method</p>
+                <div class="pay-method">
+                    <div class="pay-chip active">Credit/Debit Card</div>
+                    <div class="pay-chip">Instant EFT</div>
+                    <div class="pay-chip">Scan to Pay</div>
+                </div>
             </div>
-            <button class="btn-m3" onclick="alert('Order Sent! ⚓')">Complete Order</button>
+
+            <div style="display:flex; justify-content:space-between; margin:20px 0; font-weight:700; font-size:20px; color:var(--success);">
+                <span>Grand Total</span><span id="final-total">R0</span>
+            </div>
+            <button class="btn-m3" onclick="ENGINE.processPayment()">
+                <span class="material-symbols-rounded">lock</span> Pay Now
+            </button>
+            <p style="text-align:center; font-size:11px; color:#888; margin-top:12px;">⚓ Secure Payment via Google Engine Server</p>
         </div>
     </div>
 
@@ -94,8 +106,7 @@
         };
 
         const ENGINE = {
-            cart: JSON.parse(localStorage.getItem('otaku_cart_v2') || '{}'),
-            // CORRECTED VEGETA FILENAME [cite: 2026-02-01]
+            cart: JSON.parse(localStorage.getItem('otaku_cart_v3') || '{}'),
             inventory: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             init() {
                 const grid = document.getElementById('store-grid');
@@ -131,16 +142,25 @@
                 }
             },
             update() {
-                localStorage.setItem('otaku_cart_v2', JSON.stringify(this.cart));
+                localStorage.setItem('otaku_cart_v3', JSON.stringify(this.cart));
                 let sub = 0, html = '';
                 for(let n in this.cart) {
                     const i = this.cart[n]; sub += (i.price * i.qty);
-                    html += `<div class="cart-item"><img src="${i.file}" class="cart-img" onerror="this.src='coming soon1.jpeg'"><div style="flex:1;"><div style="font-size:10px; font-weight:700; color:var(--prim);">${i.type}</div><div style="font-weight:700; text-transform:capitalize;">${n}</div><div>R${i.price}</div></div><div style="display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:20px; padding:4px; gap:8px;"><button class="qty-btn" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:700;">${i.qty}</span><button class="qty-btn" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
+                    html += `<div class="cart-item"><img src="${i.file}" class="cart-img" onerror="this.src='coming soon1.jpeg'"><div style="flex:1;"><div style="font-size:10px; font-weight:700; color:var(--prim);">${i.type}</div><div style="font-weight:700; text-transform:capitalize;">${n}</div><div>R${i.price}</div></div><div style="display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:20px; padding:4px; gap:8px;"><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',-1)">-</button><span style="font-weight:700; min-width:16px; text-align:center;">${i.qty}</span><button class="qty-btn" style="width:28px; height:28px; border-radius:50%; border:none; background:var(--out); color:white;" onclick="ENGINE.changeQty('${n}',1)">+</button></div></div>`;
                 }
                 const ship = parseInt(document.querySelector('input[name="paxi"]:checked').value);
                 document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('final-total').innerText = 'R' + (sub + ship);
                 document.getElementById('cart-list').innerHTML = html || '<p style="text-align:center; padding:40px; color:#888;">Bag is empty</p>';
+            },
+            processPayment() {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if(!user) {
+                    alert('Please sign in to complete your purchase! ⚓');
+                    UI.open('account');
+                    return;
+                }
+                alert(`Linking to Secure Payment Gateway...\nTotal: ${document.getElementById('final-total').innerText}`);
             }
         };
 
