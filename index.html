@@ -53,7 +53,7 @@
             <div class="scroll-area">
                 <div id="checkout-list"></div>
                 <div style="margin:32px 0 16px 0;">
-                    <p style="font-weight:700; color:var(--prim); font-size:12px; text-transform:uppercase;">Delivery Method</p>
+                    <p style="font-weight:700; color:var(--prim); font-size:12px; text-transform:uppercase;">Delivery Choice</p>
                     <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><br><small>Free • Cape Town</small></div><span>R0</span></div>
                     <div id="p-100" class="paxi-chip" onclick="ENGINE.setPaxi(100, 'Express PAXI')"><div><b>Express PAXI</b><br><small>3-5 Days</small></div><span>R100</span></div>
                 </div>
@@ -72,7 +72,7 @@
     <div id="receipt-overlay" class="sheet-overlay" onclick="UI.close('receipt')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0; font-weight:700;">Review</h2>
+                <h2 style="margin:0; font-weight:700;">Order Summary</h2>
                 <button style="background:var(--out); border:none; color:white; width:36px; height:36px; border-radius:18px;" onclick="UI.close('receipt')">×</button>
             </div>
             <div class="scroll-area">
@@ -125,9 +125,8 @@
             initGPay() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    const user = JSON.parse(localStorage.getItem('otaku_user'));
-                    const env = (user && user.email === this.testEmail) ? 'TEST' : 'PRODUCTION';
-                    this.paymentsClient = new google.payments.api.PaymentsClient({environment: env});
+                    // FORCE TEST MODE FOR ALL USERS TO PREVENT PRODUCTION ERRORS
+                    this.paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
                     const btn = this.paymentsClient.createButton({ onClick: () => ENGINE.processGPay(), buttonColor: 'black', buttonType: 'buy', buttonSizeMode: 'fill' });
                     document.getElementById('gpay-btn-container').innerHTML = '';
                     document.getElementById('gpay-btn-container').appendChild(btn);
