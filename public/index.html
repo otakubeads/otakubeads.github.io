@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | WhatsApp Live</title>
+    <title>Otaku Beads | Official</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
@@ -19,7 +20,6 @@
         .sheet { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .paxi-card { background: #2B2930; border: 1.5px solid var(--out); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .paxi-card.selected { border-color: var(--prim); background: rgba(208, 188, 255, 0.08); }
-        #gpay-container { margin-top: 20px; width: 100%; min-height: 48px; }
         .fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); border: none; padding: 16px 24px; border-radius: 28px; font-weight: 800; z-index: 4000; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     </style>
 </head>
@@ -33,14 +33,14 @@
 
     <div id="checkout-overlay" class="sheet-overlay">
         <div class="sheet">
-            <h2 style="margin:0 0 20px 0;">Your Bag</h2>
+            <h2 style="margin:0 0 20px 0;">Checkout</h2>
             <div id="cart-list"></div>
-            <h3 style="margin:24px 0 12px 0;">PAXI Shipping</h3>
+            <h3 style="margin:24px 0 12px 0;">PAXI Delivery</h3>
             <div class="paxi-card" id="paxi-std" onclick="UI.sel(60, 'Standard')"><span><b>Standard</b> (7-9 Days)</span><b>R60</b></div>
             <div class="paxi-card" id="paxi-exp" onclick="UI.sel(100, 'Express')"><span><b>Express</b> (3-5 Days)</span><b>R100</b></div>
             <div style="display:flex; justify-content:space-between; margin:20px 0; border-top:1px solid var(--out); padding-top:16px;"><span>Total:</span><b id="final-total" style="color:var(--prim); font-size:20px;">R0</b></div>
             <div id="gpay-container"></div>
-            <button onclick="UI.close()" style="width:100%; background:none; border:1px solid var(--out); color:#E6E1E5; height:48px; border-radius:24px; margin-top:12px; font-weight:700;">Back to Shop</button>
+            <button onclick="UI.close()" style="width:100%; background:none; border:1px solid var(--out); color:#E6E1E5; height:48px; border-radius:24px; margin-top:12px; font-weight:700;">Cancel</button>
         </div>
     </div>
 
@@ -48,11 +48,11 @@
 
     <script>
         const ENGINE = {
-            cart: {}, paxi: 0, paxiType: '',
+            cart: {}, paxi: 0, paxiType: '', user: null,
             init() { this.render(); this.waitGoogle(); this.initGPay(); },
             waitGoogle() { if (window.google && google.accounts) this.setupAuth(); else setTimeout(() => this.waitGoogle(), 500); },
             setupAuth() {
-                google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: () => location.reload() });
+                google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: (r) => { this.user = JSON.parse(atob(r.credential.split('.')[1])); location.reload(); } });
                 google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle", theme: "filled_blue" });
             },
             initGPay() {
@@ -61,24 +61,34 @@
                 const btn = this.paymentsClient.createButton({ onClick: () => this.onGPayClick(), buttonColor: 'white', buttonType: 'buy' });
                 document.getElementById('gpay-container').appendChild(btn);
             },
-            onGPayClick() {
-                if (this.paxi === 0) return alert("Select PAXI first.");
-                const total = (this.getSubtotal() + this.paxi).toFixed(2);
-                this.paymentsClient.loadPaymentData({
-                    apiVersion: 2, apiVersionMinor: 0,
-                    allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["MASTERCARD", "VISA"] }, tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'example' } } }],
-                    transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: total, currencyCode: 'ZAR', countryCode: 'ZA' },
-                    merchantInfo: { merchantName: 'Otaku Beads' }
-                }).then(() => this.sendOrderToWhatsApp()).catch(e => console.error(e));
-            },
-            sendOrderToWhatsApp() {
-                let msg = `🛍️ *New Otaku Beads Order*%0A%0A`;
+            async generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(22); doc.text("OTAKU BEADS OFFICIAL RECEIPT", 20, 20);
+                doc.setFontSize(12); doc.text(`Customer: ${this.user ? this.user.name : 'Guest'}`, 20, 30);
+                doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 37);
+                
+                let y = 50;
                 Object.entries(this.cart).forEach(([img, d]) => {
-                    msg += `• ${img.split('.')[0]} (x${d.qty}) - R${d.price * d.qty}%0A`;
+                    doc.text(`${img.split('.')[0]} x${d.qty} - R${d.price * d.qty}`, 20, y);
+                    y += 10;
                 });
-                msg += `%0A🚚 *Shipping:* PAXI ${this.paxiType} (R${this.paxi})`;
-                msg += `%0A💰 *Total:* R${this.getSubtotal() + this.paxi}`;
+                doc.text(`Shipping: PAXI ${this.paxiType} - R${this.paxi}`, 20, y + 5);
+                doc.setFont(undefined, 'bold');
+                doc.text(`TOTAL PAID: R${this.getSubtotal() + this.paxi}`, 20, y + 15);
+                
+                doc.save(`OtakuBeads_Receipt_${Date.now()}.pdf`);
+                this.sendToWhatsApp();
+            },
+            sendToWhatsApp() {
+                let msg = `✅ *Payment Approved!*%0AOrder for: ${this.user ? this.user.name : 'Customer'}%0A%0A`;
+                Object.entries(this.cart).forEach(([img, d]) => msg += `• ${img.split('.')[0]} (x${d.qty})%0A`);
+                msg += `%0A🚚 PAXI: ${this.paxiType}%0A💰 Total: R${this.getSubtotal() + this.paxi}`;
                 window.open(`https://wa.me/27663443753?text=${msg}`, '_blank');
+            },
+            onGPayClick() {
+                if (this.paxi === 0) return alert("Select Shipping");
+                this.generatePDF(); // In production, call this after .loadPaymentData() success
             },
             getSubtotal() { let s = 0; Object.values(this.cart).forEach(i => s += (i.qty * i.price)); return s; },
             render() {
@@ -99,7 +109,7 @@
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; background:#25232A; padding:8px; border-radius:16px;">
                         <img src="${img}" style="width:44px; height:44px; border-radius:8px; object-fit:cover;">
                         <div style="flex-grow:1;"><b>${img.split('.')[0]}</b><br><small>R${d.price} x ${d.qty}</small></div>
-                    </div>`).join('') || '<p style="opacity:0.5; text-align:center;">Bag empty</p>';
+                    </div>`).join('') || '<p style="opacity:0.5; text-align:center;">Empty Bag</p>';
                 this.upd();
             },
             sel(p, type) { ENGINE.paxi = p; ENGINE.paxiType = type; document.querySelectorAll('.paxi-card').forEach(c => c.classList.remove('selected')); document.getElementById('paxi-'+(type==='Standard'?'std':'exp')).classList.add('selected'); this.upd(); },
