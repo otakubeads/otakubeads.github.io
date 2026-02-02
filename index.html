@@ -7,68 +7,90 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.symbols.google.com/24px/Material+Symbols+Rounded" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --surf: #2B2930; --err: #F2B8B5; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
         header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .logo-box { display: flex; align-items: center; gap: 12px; }
         .logo-img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
-        .brand-name { font-size: 18px; font-weight: 700; color: white; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #bag-fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); padding: 16px 24px; border-radius: 28px; font-weight: 800; border: none; z-index: 6000; display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.6); }
+        .promo-banner { background: linear-gradient(135deg, #381E72, #0F0D13); border: 1px solid var(--prim); color: white; padding: 20px; margin: 16px; border-radius: 28px; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
         .scroll-area { flex: 1; overflow-y: auto; padding: 24px; }
-        .promo-input { background: var(--surf); border: 1px solid var(--out); color: white; padding: 14px 20px; border-radius: 16px; width: 100%; box-sizing: border-box; font-family: inherit; }
-        .paxi-chip { padding: 18px; background: var(--surf); border: 2px solid transparent; border-radius: 24px; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .paxi-chip.active { border-color: var(--prim); background: rgba(208,188,255,0.12); }
+        .terms-box { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; font-size: 13px; line-height: 1.5; color: #CCC; margin-bottom: 20px; border: 1px solid var(--out); }
         .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); display: flex; flex-direction: column; gap: 12px; }
     </style>
 </head>
 <body>
     <header>
         <div class="logo-box">
-            <img src="logo.jpg" class="logo-img" onerror="this.src='https://via.placeholder.com/40'">
-            <span class="brand-name">Otaku Beads</span>
+            <img src="logo.jpg" class="logo-img">
+            <b style="font-size:18px;">Otaku Beads</b>
         </div>
         <div id="g_id_btn"></div>
     </header>
 
+    <div id="promo-section" class="promo-banner">
+        <h3 style="margin:0 0 8px 0; color:var(--prim);">Exclusive 30% Discount</h3>
+        <p style="margin:0 0 16px 0; font-size:13px; opacity:0.8;">One-off gift for new customers. Strictly one per device.</p>
+        <button class="btn-m3" style="height:40px;" onclick="UI.open('terms')">Claim Now</button>
+    </div>
+
     <main id="store-grid" class="grid"></main>
 
-    <button id="bag-fab" onclick="UI.open('checkout')">
-        <span id="bag-count">R0</span>
+    <button id="bag-fab" style="position:fixed; bottom:24px; right:20px; background:var(--prim); border:none; padding:16px 24px; border-radius:28px; font-weight:800;" onclick="UI.open('checkout')">
+        🛒 <span id="bag-count">R0</span>
     </button>
+
+    <div id="terms-overlay" class="sheet-overlay" onclick="UI.close('terms')">
+        <div class="sheet-content" onclick="event.stopPropagation()">
+            <div style="padding:24px;">
+                <h2 style="margin:0;">Promo Protocol</h2>
+            </div>
+            <div class="scroll-area">
+                <div class="terms-box">
+                    <b>🛡️ Iron-Clad Security Policy</b><br><br>
+                    1. This 30% discount is <b>Soul-Bound</b>. It is uniquely tied to your specific hardware ID and network IP address.<br><br>
+                    2. <b>The "One-Click Burn" Rule:</b> Once you click "Copy & Activate", this code is marked as used for this device. If you lose the code or share it, it cannot be regenerated.<br><br>
+                    3. Attempting to bypass this via multiple Google accounts will result in an automatic device block.
+                </div>
+                <label style="display:flex; align-items:center; gap:12px; padding:16px; background:var(--surf); border-radius:16px;">
+                    <input type="checkbox" id="accept-terms" style="width:20px; height:20px;">
+                    <span style="font-size:14px;">I understand the One-Click Burn policy.</span>
+                </label>
+            </div>
+            <div class="sticky-footer">
+                <button class="btn-m3" onclick="ENGINE.claimPromo()">Activate & Copy Code</button>
+            </div>
+        </div>
+    </div>
 
     <div id="checkout-overlay" class="sheet-overlay" onclick="UI.close('checkout')">
         <div class="sheet-content" onclick="event.stopPropagation()">
-            <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0;">Your Bag</h2>
+            <div style="padding:24px; display:flex; justify-content:space-between;">
+                <h2 style="margin:0;">Bag</h2>
                 <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; border-radius:20px; width:40px; height:40px;">×</button>
             </div>
             <div class="scroll-area">
                 <div id="checkout-list"></div>
-                <div style="margin-top:24px;">
-                    <p style="font-weight:700; color:var(--prim); font-size:12px; text-transform:uppercase;">One-Off Promo</p>
-                    <input type="text" id="promo-box" class="promo-input" placeholder="Enter code..." oninput="ENGINE.applyPromo(this.value)">
-                    <p id="promo-msg" style="font-size:12px; margin-top:8px;"></p>
-                </div>
-                <div style="margin-top:32px;">
-                    <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b></div><span>R0</span></div>
-                    <div id="p-100" class="paxi-chip" onclick="ENGINE.setPaxi(100, 'Express PAXI')"><div><b>Express PAXI</b></div><span>R100</span></div>
+                <div style="margin-top:24px; padding:20px; background:var(--surf); border-radius:24px;">
+                    <p style="margin:0 0 12px 0; font-size:12px; font-weight:700; color:var(--prim);">PASTE YOUR BURN-CODE</p>
+                    <input type="text" id="promo-box" style="width:100%; background:var(--bg); border:1px solid var(--out); color:white; padding:14px; border-radius:12px; box-sizing:border-box;" placeholder="Enter code..." oninput="ENGINE.validateCode(this.value)">
+                    <p id="promo-status" style="font-size:12px; margin-top:8px;"></p>
                 </div>
             </div>
             <div class="sticky-footer">
-                <div id="price-breakdown" style="font-size:14px; opacity:0.8;"></div>
+                <div id="price-summary" style="font-size:14px; opacity:0.8;"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:700;">Total</span>
-                    <span id="check-sub" style="font-size:24px; font-weight:800; color:var(--prim);">R0</span>
+                    <b style="font-size:20px;">Total</b>
+                    <b id="check-total" style="font-size:24px; color:var(--prim);">R0</b>
                 </div>
-                <div id="gpay-btn-container"></div>
+                <div id="gpay-container"></div>
             </div>
         </div>
     </div>
@@ -80,100 +102,70 @@
         };
 
         const ENGINE = {
-            cart: {}, paxiPrice: 0, paxiName: 'Collection', subTotal: 0, discount: 0,
-            // Generate unique Device Fingerprint
-            getDeviceID() { return btoa(navigator.userAgent + (navigator.hardwareConcurrency || 2) + screen.width); },
-            items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
-            clean(n) { return n.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : n.split('.')[0].replace(/[_-]/g, ' '); },
+            cart: {}, subTotal: 0, discount: 0,
+            code: "OTAKU-" + Math.random().toString(36).substr(2, 6).toUpperCase(),
             
-            init() {
-                document.getElementById('store-grid').innerHTML = this.items.map(f => {
-                    const label = this.clean(f); const p = label.toLowerCase().includes('keychain') ? 50 : 40;
-                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${label}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})">Add</button></div></div>`;
-                }).join('');
-                this.setupIdentity();
-                this.initGPay();
+            async getFingerprint() {
+                const ipData = await fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip: 'unknown'}));
+                return btoa(ipData.ip + navigator.userAgent + screen.width);
             },
 
-            setupIdentity() {
-                const check = () => {
-                    if (typeof google === "undefined" || !google.accounts) return setTimeout(check, 500);
-                    google.accounts.id.initialize({ 
-                        client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", 
-                        callback: (r) => { localStorage.setItem('otaku_user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
-                    });
-                    const saved = JSON.parse(localStorage.getItem('otaku_user'));
-                    if(saved) document.getElementById("g_id_btn").innerHTML = `<div onclick="localStorage.removeItem('otaku_user'); location.reload();" style="cursor:pointer;"><img src="${saved.picture}" style="width:32px; height:32px; border-radius:50%;"></div>`;
-                    else google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle" });
-                };
-                check();
+            async claimPromo() {
+                if(!document.getElementById('accept-terms').checked) return alert("Please accept the policy first.");
+                
+                const id = await this.getFingerprint();
+                const burned = JSON.parse(localStorage.getItem('burned_devices') || '[]');
+                
+                if(burned.includes(id)) {
+                    alert("This device has already burned its one-off promo.");
+                    UI.close('terms');
+                    return;
+                }
+
+                navigator.clipboard.writeText(this.code);
+                burned.push(id);
+                localStorage.setItem('burned_devices', JSON.stringify(burned));
+                alert("Code " + this.code + " Copied! Use it now—it's locked to your device.");
+                document.getElementById('promo-section').innerHTML = `<p style="text-align:center; color:var(--prim); font-weight:700;">✅ PROMO BURNED TO THIS DEVICE</p>`;
+                UI.close('terms');
             },
 
-            applyPromo(code) {
-                const user = JSON.parse(localStorage.getItem('otaku_user'));
-                const msg = document.getElementById('promo-msg');
-                const deviceID = this.getDeviceID();
-                const usedDeviceLocks = JSON.parse(localStorage.getItem('device_locks') || '[]');
-                const usedEmailLocks = JSON.parse(localStorage.getItem('email_locks') || '[]');
-
-                if(!user) { msg.innerText = "Sign in to use promo codes"; msg.style.color = "var(--err)"; return; }
-
-                if(code.toUpperCase() === 'FIRSTOTAKU') {
-                    if(usedDeviceLocks.includes(deviceID) || usedEmailLocks.includes(user.email)) {
-                        msg.innerText = "❌ Security Alert: Promo already used on this device.";
-                        msg.style.color = "var(--err)";
-                        this.discount = 0;
-                    } else {
-                        msg.innerText = "✅ 30% Discount Applied!";
-                        msg.style.color = "#81C784";
-                        this.discount = Math.floor(this.subTotal * 0.3);
-                    }
-                } else { msg.innerText = ""; this.discount = 0; }
+            validateCode(val) {
+                const status = document.getElementById('promo-status');
+                if(val.trim().toUpperCase() === this.code) {
+                    this.discount = Math.floor(this.subTotal * 0.3);
+                    status.innerText = "Verified: 30% Off Applied";
+                    status.style.color = "#81C784";
+                } else {
+                    this.discount = 0;
+                    status.innerText = "Invalid or Burned Code.";
+                    status.style.color = "var(--err)";
+                }
                 this.update();
             },
 
-            initGPay() {
-                const check = () => {
-                    if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    this.paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-                    const btn = this.paymentsClient.createButton({ onClick: () => ENGINE.processGPay(), buttonColor: 'black', buttonType: 'buy' });
-                    document.getElementById('gpay-btn-container').appendChild(btn);
-                };
-                check();
-            },
+            items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
+            clean(n) { return n.split('.')[0].replace(/[_-]/g, ' '); },
 
-            processGPay() {
-                const request = {
-                    apiVersion: 2, apiVersionMinor: 0,
-                    allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'], allowedCardNetworks: ['VISA', 'MASTERCARD'] }, tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'exampleGatewayMerchantId' } } }],
-                    transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: String(this.subTotal - this.discount + this.paxiPrice), currencyCode: 'ZAR', countryCode: 'ZA' },
-                    merchantInfo: { merchantName: 'Otaku Beads' }
-                };
-                this.paymentsClient.loadPaymentData(request).then(() => {
-                    if(this.discount > 0) {
-                        const dl = JSON.parse(localStorage.getItem('device_locks') || '[]');
-                        const el = JSON.parse(localStorage.getItem('email_locks') || '[]');
-                        dl.push(this.getDeviceID()); el.push(JSON.parse(localStorage.getItem('otaku_user')).email);
-                        localStorage.setItem('device_locks', JSON.stringify(dl));
-                        localStorage.setItem('email_locks', JSON.stringify(el));
-                    }
-                    window.location.reload();
-                }).catch(() => {});
+            init() {
+                document.getElementById('store-grid').innerHTML = this.items.map(f => {
+                    const p = f.toLowerCase().includes('keychain') ? 50 : 40;
+                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${this.clean(f)}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})">Add</button></div></div>`;
+                }).join('');
             },
 
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
-            setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; [0, 100].forEach(v => document.getElementById('p-'+v).classList.toggle('active', v === p)); this.update(); },
             update() {
                 let sub = 0; let html = '';
                 for(let n in this.cart) { 
-                    sub += (this.cart[n].p * this.cart[n].qty); 
+                    sub += (this.cart[n].p * this.cart[n].qty);
                     html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
                 }
-                this.subTotal = sub; if(this.discount > 0) this.discount = Math.floor(sub * 0.3);
-                document.getElementById('bag-count').innerText = 'R' + (sub - this.discount + this.paxiPrice);
-                document.getElementById('check-sub').innerText = 'R' + (sub - this.discount + this.paxiPrice);
-                document.getElementById('price-breakdown').innerHTML = this.discount > 0 ? `Subtotal: R${sub} | Discount: -R${this.discount}` : '';
-                document.getElementById('checkout-list').innerHTML = html;
+                this.subTotal = sub;
+                document.getElementById('bag-count').innerText = 'R' + (sub - this.discount);
+                document.getElementById('check-total').innerText = 'R' + (sub - this.discount);
+                document.getElementById('price-summary').innerText = this.discount > 0 ? `Subtotal: R${sub} - Discount: R${this.discount}` : '';
+                document.getElementById('checkout-list').innerHTML = html || 'Empty';
             }
         };
         ENGINE.init();
