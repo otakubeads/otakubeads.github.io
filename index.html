@@ -11,15 +11,14 @@
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #25232A; --surf: #2B2930; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
+        .banner { background: var(--surf); border: 1px solid var(--prim); padding: 16px; border-radius: 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100000; display: none; align-items: flex-end; }
-        .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
-    <header>
+    <header style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:12px;">
             <img src="logo.jpg" style="width:40px; height:40px; border-radius:10px;">
             <b style="font-size:18px;">Otaku Beads</b>
@@ -29,61 +28,51 @@
 
     <main id="store-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:16px;"></main>
 
-    <button style="position:fixed; bottom:24px; right:20px; background:var(--prim); border:none; padding:16px 24px; border-radius:28px; font-weight:800; color:var(--on-prim); z-index:99999; display:flex; align-items:center; gap:8px;" onclick="UI.open()">
-        <span class="material-symbols-rounded">shopping_bag</span> <span id="bag-count">R0</span>
-    </button>
-
     <div id="checkout-overlay" class="sheet-overlay" onclick="UI.close()">
         <div class="sheet-content" onclick="event.stopPropagation()">
+            <div id="auth-banner"></div>
             <h2>Your Bag</h2>
-            <div id="bag-list" style="margin-bottom:24px;"></div>
-            <div id="payment-zone"></div>
+            <div id="bag-list" style="margin-top:20px;"></div>
+            <div id="payment-zone" style="margin-top:32px;"></div>
         </div>
     </div>
 
     <script>
         const ENGINE = {
-            user: null,
-            cart: {},
+            user: JSON.parse(localStorage.getItem('otaku_session')),
             init() {
+                this.renderStore();
                 this.setupAuth();
-                this.renderItems();
             },
             setupAuth() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.accounts) return setTimeout(check, 500);
                     google.accounts.id.initialize({ 
-                        client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", 
-                        callback: (r) => { 
-                            this.user = JSON.parse(atob(r.credential.split('.')[1]));
-                            localStorage.setItem('otaku_session', JSON.stringify(this.user));
+                        client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
+                        callback: (r) => {
+                            localStorage.setItem('otaku_session', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1]))));
                             location.reload();
                         }
                     });
-                    this.user = JSON.parse(localStorage.getItem('otaku_session'));
                     if(this.user) document.getElementById("g_id_btn").innerHTML = `<img src="${this.user.picture}" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--prim);">`;
                     else google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle" });
                 };
                 check();
             },
-            initPayment() {
+            renderPayment() {
                 const zone = document.getElementById('payment-zone');
+                const banner = document.getElementById('auth-banner');
                 if (this.user) {
-                    // Signed In: Google Pay Enabled
+                    banner.innerHTML = '';
                     const client = new google.payments.api.PaymentsClient({environment: 'PRODUCTION'});
-                    const btn = client.createButton({ onClick: () => console.log("GPay Processing...") });
-                    zone.innerHTML = '<p style="margin-bottom:12px; opacity:0.7;">Secure Checkout via Google Pay</p>';
-                    zone.appendChild(btn);
+                    zone.innerHTML = '<p style="margin-bottom:12px; opacity:0.7;">Secure Google Pay Enabled</p>';
+                    zone.appendChild(client.createButton({ onClick: () => window.open('https://wa.me/27663443753', '_blank') }));
                 } else {
-                    // Guest: WhatsApp Mode Only
-                    zone.innerHTML = `
-                        <p style="margin-bottom:12px; color:var(--prim);">Guest Mode: WhatsApp Checkout</p>
-                        <button class="btn-m3" onclick="window.open('https://wa.me/27663443753', '_blank')">
-                            Order via WhatsApp
-                        </button>`;
+                    banner.innerHTML = `<div class="banner"><span class="material-symbols-rounded" style="color:var(--prim)">lock</span><small>Sign in to unlock secure Google Pay checkout.</small></div>`;
+                    zone.innerHTML = `<button class="btn-m3" onclick="window.open('https://wa.me/27663443753', '_blank')">Order via WhatsApp</button>`;
                 }
             },
-            renderItems() {
+            renderStore() {
                 const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
                 document.getElementById('store-grid').innerHTML = items.map(f => {
                     const p = f.toLowerCase().includes('keychain') ? 50 : 40;
@@ -91,23 +80,10 @@
                     if(n.toLowerCase()==="usopp") n="Usopp Bracelet";
                     return `<div style="background:var(--card); border-radius:28px; overflow:hidden; border:1px solid var(--out);"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;"><div style="padding:16px;"><b>${n}</b><br><span>R${p}</span><button onclick="ENGINE.add('${n}',${p})" style="width:100%; margin-top:12px; height:36px; border-radius:18px; border:none; background:var(--prim); font-weight:700;">Add</button></div></div>`;
                 }).join('');
-            },
-            add(n, p) {
-                if(!this.cart[n]) this.cart[n] = {p, qty:0};
-                this.cart[n].qty++;
-                let total = 0;
-                for(let k in this.cart) total += (this.cart[k].p * this.cart[k].qty);
-                document.getElementById('bag-count').innerText = 'R' + total;
-                this.updateBagUI();
-            },
-            updateBagUI() {
-                let html = '';
-                for(let k in this.cart) html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${k} x${this.cart[k].qty}</span><b>R${this.cart[k].p * this.cart[k].qty}</b></div>`;
-                document.getElementById('bag-list').innerHTML = html || 'Your bag is empty';
             }
         };
         const UI = {
-            open() { document.getElementById('checkout-overlay').style.display = 'flex'; setTimeout(() => document.getElementById('checkout-overlay').classList.add('active'), 10); ENGINE.initPayment(); },
+            open() { document.getElementById('checkout-overlay').style.display = 'flex'; setTimeout(() => document.getElementById('checkout-overlay').classList.add('active'), 10); ENGINE.renderPayment(); },
             close() { document.getElementById('checkout-overlay').classList.remove('active'); setTimeout(() => document.getElementById('checkout-overlay').style.display = 'none', 300); }
         };
         ENGINE.init();
