@@ -14,7 +14,6 @@
         header { position: sticky; top: 0; background: rgba(15,13,19,0.9); backdrop-filter: blur(20px); padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .auth-anchor { display: flex; align-items: center; justify-content: flex-end; flex: 1; }
         .user-pill { background: var(--surf); border: 1px solid var(--out); border-radius: 24px; padding: 4px 12px; display: flex; align-items: center; cursor: pointer; height: 36px; }
-        .test-badge { background: #FFD600; color: black; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -60,11 +59,11 @@
             </div>
             <div class="sticky-footer">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="opacity:0.8; font-weight:700;">Total</span>
+                    <span style="opacity:0.8; font-weight:700;">Total Amount</span>
                     <span id="check-sub" style="font-size:24px; font-weight:800; color:var(--prim);">R0</span>
                 </div>
-                <button class="btn-m3" style="background:transparent; border:1px solid var(--out); color:white;" onclick="ENGINE.genReceipt('WA')">Pay Manually</button>
                 <div id="gpay-btn-container"></div>
+                <p id="fail-safe-msg" style="display:none; text-align:center; font-size:12px; color:var(--prim);">Switching to WhatsApp Checkout...</p>
             </div>
         </div>
     </div>
@@ -93,7 +92,6 @@
 
         const ENGINE = {
             cart: {}, paxiPrice: 0, paxiName: 'Collection', subTotal: 0,
-            testEmail: 'elginno.otakubeads@gmail.com',
             items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             clean(n) { return n.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : n.split('.')[0].replace(/[_-]/g, ' '); },
             init() {
@@ -114,8 +112,7 @@
                     const saved = JSON.parse(localStorage.getItem('otaku_user'));
                     const btnContainer = document.getElementById("g_id_btn");
                     if(saved) {
-                        const isTest = saved.email === this.testEmail;
-                        btnContainer.innerHTML = `<div class="user-pill" onclick="localStorage.removeItem('otaku_user'); location.reload();"><img src="${saved.picture}" style="width:28px; height:28px; border-radius:50%;"> ${isTest ? '<span class="test-badge">Tester</span>' : ''}<span class="signout-label">Sign Out</span></div>`;
+                        btnContainer.innerHTML = `<div class="user-pill" onclick="localStorage.removeItem('otaku_user'); location.reload();"><img src="${saved.picture}" style="width:28px; height:28px; border-radius:50%;"><span class="signout-label">Sign Out</span></div>`;
                     } else {
                         google.accounts.id.renderButton(btnContainer, { type: "standard", theme: "filled_blue", size: "large", text: "signin_with", shape: "pill", width: "220" });
                     }
@@ -125,7 +122,6 @@
             initGPay() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    // FORCE TEST MODE FOR ALL USERS TO PREVENT PRODUCTION ERRORS
                     this.paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
                     const btn = this.paymentsClient.createButton({ onClick: () => ENGINE.processGPay(), buttonColor: 'black', buttonType: 'buy', buttonSizeMode: 'fill' });
                     document.getElementById('gpay-btn-container').innerHTML = '';
@@ -140,10 +136,16 @@
                     transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: String(this.subTotal + this.paxiPrice), currencyCode: 'ZAR', countryCode: 'ZA' },
                     merchantInfo: { merchantName: 'Otaku Beads' }
                 };
+                
                 this.paymentsClient.loadPaymentData(paymentDataRequest).then(() => {
                     ENGINE.genReceipt('GPAY_DONE');
-                    setTimeout(() => ENGINE.checkoutWA(true), 2000);
-                }).catch(err => console.log('Payment sheet closed', err));
+                    setTimeout(() => ENGINE.checkoutWA(true), 1500);
+                }).catch(err => {
+                    console.log('GPay block/cancel - moving to WA Fail-Safe');
+                    document.getElementById('gpay-btn-container').style.display = 'none';
+                    document.getElementById('fail-safe-msg').style.display = 'block';
+                    setTimeout(() => ENGINE.checkoutWA(false), 1000);
+                });
             },
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
             setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; [0, 100].forEach(v => document.getElementById('p-'+v).classList.toggle('active', v === p)); this.update(); },
@@ -159,14 +161,14 @@
                 document.getElementById('receipt-items').innerHTML = document.getElementById('checkout-list').innerHTML;
                 document.getElementById('receipt-totals').innerHTML = `<div style="display:flex; justify-content:space-between;"><span>Delivery (${this.paxiName})</span><span>R${this.paxiPrice}</span></div><div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; color:#1B5E20; margin-top:12px;"><span>Total</span><span>R${this.subTotal + this.paxiPrice}</span></div>`;
                 const footer = document.getElementById('receipt-footer');
-                if(mode === 'GPAY_DONE') { footer.innerHTML = `<p style="text-align:center; color:#4CAF50; font-weight:700;">✅ Payment Success! Sending Receipt...</p>`; }
-                else { footer.innerHTML = `<button class="btn-m3" style="background:#25D366; color:white;" onclick="ENGINE.checkoutWA(false)">WhatsApp Receipt</button>`; }
+                if(mode === 'GPAY_DONE') { footer.innerHTML = `<p style="text-align:center; color:#4CAF50; font-weight:700;">✅ Success! Sending Receipt...</p>`; }
+                else { footer.innerHTML = `<button class="btn-m3" style="background:#25D366; color:white;" onclick="ENGINE.checkoutWA(false)">Send to WhatsApp</button>`; }
                 UI.open('receipt');
             },
             checkoutWA(isPaid) {
                 let list = ""; for(let n in this.cart) { list += `${this.clean(n)} (x${this.cart[n].qty})\n`; }
                 const user = JSON.parse(localStorage.getItem('otaku_user')) || {name: "Customer"};
-                const status = isPaid ? "✅ PAID VIA GPAY" : "⏳ PENDING";
+                const status = isPaid ? "✅ PAID VIA GPAY" : "⏳ PENDING (MANUAL)";
                 const msg = `⚓ OTAKU BEADS ORDER\nCustomer: ${user.name}\nStatus: ${status}\n\n${list}Delivery: ${this.paxiName}\nTotal: R${this.subTotal + this.paxiPrice}`;
                 window.location.href = `whatsapp://send?phone=27663443753&text=${encodeURIComponent(msg)}`;
             }
