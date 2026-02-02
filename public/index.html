@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | Secure Checkout</title>
+    <title>Otaku Beads | Official</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,121 +12,112 @@
     <style>
         :root { --bg: #0F0D13; --card: #1C1921; --prim: #D0BCFF; --on-prim: #381E72; --out: #49454F; --sheet: #1C1B1F; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: #E6E1E5; margin: 0; padding-bottom: 120px; overflow-x: hidden; }
-        header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; height: 64px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; margin: 0 auto; max-width: 500px; }
+        header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 0 16px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; height: 64px; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--prim); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; max-width: 500px; margin: 0 auto; }
         .m3-card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .paxi-card { background: #2B2930; border: 1.5px solid var(--out); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .paxi-card { background: #2B2930; border: 1.5px solid var(--out); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; }
         .paxi-card.selected { border-color: var(--prim); background: rgba(208, 188, 255, 0.08); }
-        .fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); border: none; padding: 16px 24px; border-radius: 28px; font-weight: 800; z-index: 4000; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .fab { position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); border: none; padding: 16px 24px; border-radius: 28px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 4000; }
     </style>
 </head>
 <body>
     <header>
         <div style="display:flex; align-items:center; gap:10px;"><img src="logo.jpg" style="width:32px; border-radius:8px;"> <span style="font-size:18px; font-weight:700;">Otaku Beads</span></div>
-        <div id="g_id_btn"></div>
+        <div id="auth-container">
+            <div id="g_id_onload" data-client_id="919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" data-callback="onSignIn"></div>
+            <div class="g_id_signin" data-type="icon" data-shape="circle"></div>
+        </div>
     </header>
 
     <main id="store-grid" class="grid"></main>
 
     <div id="checkout-overlay" class="sheet-overlay">
         <div class="sheet">
-            <h2 style="margin:0 0 20px 0;">Bag</h2>
+            <h2 style="margin:0 0 20px 0;">Checkout</h2>
             <div id="cart-list"></div>
-            <h3 style="margin:24px 0 12px 0;">Shipping</h3>
+            <h3 style="margin:20px 0 10px 0;">Shipping</h3>
             <div class="paxi-card" id="paxi-std" onclick="UI.sel(60, 'Standard')"><span><b>Standard</b> (7-9 Days)</span><b>R60</b></div>
             <div class="paxi-card" id="paxi-exp" onclick="UI.sel(100, 'Express')"><span><b>Express</b> (3-5 Days)</span><b>R100</b></div>
-            <div style="display:flex; justify-content:space-between; margin:20px 0; border-top:1px solid var(--out); padding-top:16px;"><span>Total:</span><b id="final-total" style="color:var(--prim); font-size:20px;">R0</b></div>
-            <div id="gpay-container"></div>
-            <button onclick="UI.close()" style="width:100%; background:none; border:1px solid var(--out); color:#E6E1E5; height:48px; border-radius:24px; margin-top:12px; font-weight:700;">Cancel</button>
+            <button onclick="ENGINE.onGPayClick()" style="width:100%; background:var(--prim); color:var(--on-prim); height:56px; border-radius:28px; font-weight:800; border:none; margin-top:20px;">Pay with GPay</button>
+            <button onclick="UI.close()" style="width:100%; background:none; border:1px solid var(--out); color:#E6E1E5; height:48px; border-radius:24px; margin-top:12px;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="receipt-menu" class="sheet-overlay">
+        <div class="sheet" style="text-align:center;">
+            <span class="material-symbols-rounded" style="font-size:64px; color:var(--prim);">verified</span>
+            <h2>Order Confirmed!</h2>
+            <div id="preview-box" style="text-align:left; background:#25232A; padding:16px; border-radius:20px; margin:20px 0;"></div>
+            <button onclick="ENGINE.generatePDF(true)" style="width:100%; background:var(--prim); color:var(--on-prim); height:56px; border-radius:28px; font-weight:800; border:none; margin-bottom:12px;">Download Receipt</button>
+            <button onclick="location.reload()" style="width:100%; background:none; border:1px solid var(--out); color:#E6E1E5; height:48px; border-radius:24px;">Done</button>
         </div>
     </div>
 
     <button class="fab" onclick="UI.open()"><span class="material-symbols-rounded">shopping_bag</span> <span id="bag-total">R0</span></button>
 
     <script>
-        const ENGINE = {
-            cart: {}, paxi: 0, paxiType: '', user: null,
-            init() { this.render(); this.waitGoogle(); this.initGPay(); },
-            waitGoogle() { if (window.google && google.accounts) this.setupAuth(); else setTimeout(() => this.waitGoogle(), 500); },
-            setupAuth() {
-                google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", callback: (r) => { this.user = JSON.parse(atob(r.credential.split('.')[1])); location.reload(); } });
-                google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle", theme: "filled_blue" });
-            },
-            initGPay() {
-                if (!window.google || !google.payments) return setTimeout(() => this.initGPay(), 500);
-                this.paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST' });
-                const btn = this.paymentsClient.createButton({ onClick: () => this.onGPayClick(), buttonColor: 'white', buttonType: 'buy' });
-                document.getElementById('gpay-container').appendChild(btn);
-            },
-            onGPayClick() {
-                if (this.paxi === 0) return alert("Please select a PAXI shipping option.");
-                const total = (this.getSubtotal() + this.paxi).toFixed(2);
-                
-                const request = {
-                    apiVersion: 2, apiVersionMinor: 0,
-                    allowedPaymentMethods: [{
-                        type: 'CARD',
-                        parameters: { allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["MASTERCARD", "VISA"] },
-                        tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'example' } }
-                    }],
-                    transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: total, currencyCode: 'ZAR', countryCode: 'ZA' },
-                    merchantInfo: { merchantName: 'Otaku Beads' }
-                };
+        function onSignIn(r) {
+            const user = JSON.parse(atob(r.credential.split('.')[1]));
+            localStorage.setItem('otaku_user', JSON.stringify(user));
+            renderUser(user);
+        }
+        function renderUser(u) { if(u) document.getElementById('auth-container').innerHTML = `<img src="${u.picture}" class="user-avatar">`; }
 
-                this.paymentsClient.loadPaymentData(request)
-                    .then(data => {
-                        console.log("Payment Successful", data);
-                        this.generateReceipt();
-                    })
-                    .catch(err => console.error("Payment failed or cancelled", err));
+        const ENGINE = {
+            cart: {}, paxi: 0, paxiType: '',
+            init() {
+                this.render();
+                const u = localStorage.getItem('otaku_user');
+                if(u) renderUser(JSON.parse(u));
             },
-            generateReceipt() {
+            async generatePDF(dl) {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.setFontSize(20); doc.text("OTAKU BEADS RECEIPT", 20, 20);
-                doc.setFontSize(12); doc.text(`Customer: ${this.user ? this.user.name : 'Guest'}`, 20, 30);
-                let y = 50;
-                Object.entries(this.cart).forEach(([img, d]) => {
-                    doc.text(`${img.split('.')[0]} x${d.qty} - R${d.price * d.qty}`, 20, y);
+                try { doc.addImage('logo.jpg', 'JPEG', 15, 15, 20, 20); } catch(e) {}
+                doc.setFontSize(22); doc.text("OTAKU BEADS", 40, 28);
+                doc.setFontSize(10); doc.text(`Date: ${new Date().toLocaleString()}`, 140, 20);
+                doc.text("Payment: Google Pay", 140, 25);
+                let y = 60;
+                for (const [img, d] of Object.entries(this.cart)) {
+                    doc.text(`${img.split('.')[0]} (x${d.qty})`, 25, y);
+                    doc.text(`R${d.price * d.qty}`, 160, y);
                     y += 10;
-                });
-                doc.text(`PAXI Shipping: ${this.paxiType} (R${this.paxi})`, 20, y+5);
-                doc.text(`TOTAL: R${this.getSubtotal() + this.paxi}`, 20, y+15);
-                doc.save(`OtakuBeads_${Date.now()}.pdf`);
-                
-                // Now send to WhatsApp
-                let msg = `🛍️ *Order Confirmed!*%0A%0A`;
-                Object.entries(this.cart).forEach(([img, d]) => msg += `• ${img.split('.')[0]} (x${d.qty})%0A`);
-                msg += `%0A🚚 PAXI: ${this.paxiType}%0A💰 Total: R${this.getSubtotal() + this.paxi}`;
-                window.open(`https://wa.me/27663443753?text=${msg}`, '_blank');
+                }
+                doc.text(`Shipping: R${this.paxi}`, 160, y+5);
+                doc.setFontSize(14); doc.text(`TOTAL: R${this.getSubtotal()+this.paxi}`, 140, y+15);
+                doc.setFontSize(10); doc.text("Your support means the world to our fandom community.", 105, y+35, {align:"center"});
+                if(dl) doc.save(`OtakuBeads_Receipt.pdf`);
+                else this.sendWA();
             },
-            getSubtotal() { let s = 0; Object.values(this.cart).forEach(i => s += (i.qty * i.price)); return s; },
+            sendWA() {
+                let m = `🛍️ *Order Confirmed!*%0A💰 Total: R${this.getSubtotal()+this.paxi}`;
+                window.open(`https://wa.me/27663443753?text=${m}`, '_blank');
+            },
+            onGPayClick() { if(this.paxi===0) return alert("Select Shipping"); UI.showReceipt(); this.generatePDF(false); },
+            getSubtotal() { let s=0; Object.values(this.cart).forEach(i=>s+=i.qty*i.price); return s; },
             render() {
                 const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
-                document.getElementById('store-grid').innerHTML = items.map(f => {
-                    const p = f.toLowerCase().includes('keychain') ? 50 : 40;
-                    return `<div class="m3-card"><img src="${f}" style="width:100%; height:160px; object-fit:cover;"><div style="padding:12px;"><b>${f.split('.')[0]}</b><br>R${p}<button onclick="ENGINE.add('${f}', ${p})" style="width:100%;margin-top:8px;height:32px;border-radius:16px;border:none;background:var(--prim);font-weight:700;">Add</button></div></div>`;
-                }).join('');
+                document.getElementById('store-grid').innerHTML = items.map(f => `
+                    <div class="m3-card"><img src="${f}" style="width:100%; height:160px; object-fit:cover;">
+                    <div style="padding:12px;"><b>${f.split('.')[0]}</b><br>R${f.includes('keychain')?50:40}
+                    <button onclick="ENGINE.add('${f}', ${f.includes('keychain')?50:40})" style="width:100%;margin-top:8px;height:32px;border-radius:16px;border:none;background:var(--prim);font-weight:700;">Add</button></div></div>`).join('');
             },
-            add(img, price) { if (!this.cart[img]) this.cart[img] = { qty: 0, price: price }; this.cart[img].qty++; this.updAll(); },
-            updAll() { document.getElementById('bag-total').innerText = 'R' + this.getSubtotal(); UI.upd(); }
+            add(img, p) { if(!this.cart[img]) this.cart[img]={qty:0, price:p}; this.cart[img].qty++; this.upd(); },
+            upd() { document.getElementById('bag-total').innerText = 'R' + this.getSubtotal(); }
         };
         const UI = {
             open() { document.getElementById('checkout-overlay').classList.add('active'); this.refresh(); },
             close() { document.getElementById('checkout-overlay').classList.remove('active'); },
-            refresh() {
-                document.getElementById('cart-list').innerHTML = Object.entries(ENGINE.cart).map(([img, d]) => `
-                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; background:#25232A; padding:8px; border-radius:16px;">
-                        <img src="${img}" style="width:44px; height:44px; border-radius:8px; object-fit:cover;">
-                        <div style="flex-grow:1;"><b>${img.split('.')[0]}</b><br><small>R${d.price} x ${d.qty}</small></div>
-                    </div>`).join('') || '<p style="opacity:0.5; text-align:center;">Empty Bag</p>';
-                this.upd();
+            sel(p, t) { ENGINE.paxi=p; ENGINE.paxiType=t; document.querySelectorAll('.paxi-card').forEach(c=>c.classList.remove('selected')); document.getElementById('paxi-'+(t==='Standard'?'std':'exp')).classList.add('selected'); },
+            showReceipt() {
+                this.close(); document.getElementById('receipt-menu').classList.add('active');
+                document.getElementById('preview-box').innerHTML = `<b>Items:</b><br>` + Object.entries(ENGINE.cart).map(([img, d]) => `• ${img.split('.')[0]} x${d.qty}<br>`).join('') + `<br><b>Total Paid: R${ENGINE.getSubtotal()+ENGINE.paxi}</b>`;
             },
-            sel(p, type) { ENGINE.paxi = p; ENGINE.paxiType = type; document.querySelectorAll('.paxi-card').forEach(c => c.classList.remove('selected')); document.getElementById('paxi-'+(type==='Standard'?'std':'exp')).classList.add('selected'); this.upd(); },
-            upd() { document.getElementById('final-total').innerText = 'R' + (ENGINE.getSubtotal() + ENGINE.paxi); }
+            refresh() { document.getElementById('cart-list').innerHTML = Object.entries(ENGINE.cart).map(([img, d]) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;"><img src="${img}" style="width:40px;height:40px;border-radius:8px;"><b>${img.split('.')[0]}</b></div>`).join(''); }
         };
         ENGINE.init();
     </script>
