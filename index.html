@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V340</title>
+    <title>Otaku Beads | V341</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -26,6 +26,7 @@
             padding: 4px 10px; display: flex; align-items: center; height: 34px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
         }
+        .signout-label { font-size: 12px; font-weight: 700; color: var(--prim); margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
@@ -34,6 +35,12 @@
             height: 48px; border-radius: 24px; border: none; font-weight: 700; 
             background: var(--prim); color: var(--on-prim); width: 100%; 
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        #bag-fab { 
+            position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); 
+            padding: 16px 24px; border-radius: 24px; font-weight: 800; border: none; z-index: 6000; 
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
         }
 
         #gpay-container { margin-top: 12px; width: 100%; height: 48px; border-radius: 24px; overflow: hidden; }
@@ -45,19 +52,14 @@
             position: relative;
         }
         .paxi-chip.active { border-color: var(--prim); background: rgba(208,188,255,0.05); }
-        
+        .paxi-chip b { color: var(--prim); font-size: 14px; }
+        .paxi-chip small { opacity: 0.6; display: block; margin-top: 4px; }
+
         .popular-badge {
             background: var(--prim); color: var(--on-prim); font-size: 10px; font-weight: 900;
             padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px;
             text-transform: uppercase; position: absolute; top: -10px; right: 12px;
         }
-
-        @keyframes premium-glow {
-            0% { border-color: rgba(208,188,255,0.1); }
-            50% { border-color: rgba(208,188,255,0.4); }
-            100% { border-color: rgba(208,188,255,0.1); }
-        }
-        .express-pulse:not(.active) { animation: premium-glow 2s infinite ease-in-out; }
 
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
@@ -67,11 +69,7 @@
         .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); }
         
         .receipt-card { background: white; color: black; padding: 28px; border-radius: 24px; margin-bottom: 20px; position: relative; }
-        .paid-watermark { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
-            border: 4px solid #4CAF50; color: #4CAF50; padding: 10px 20px; border-radius: 12px;
-            font-weight: 900; font-size: 32px; opacity: 0.15; display: none;
-        }
+        .thumb { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -85,6 +83,10 @@
 
     <main id="store-grid" class="grid"></main>
 
+    <button id="bag-fab" onclick="UI.open('checkout')">
+        <span class="material-symbols-rounded">shopping_bag</span> <span id="bag-count">R0</span>
+    </button>
+
     <div id="checkout-overlay" class="sheet-overlay" onclick="UI.close('checkout')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
@@ -94,12 +96,12 @@
             <div class="scroll-area">
                 <div id="checkout-list"></div>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:24px 0;">
-                <p style="font-weight:700; color:var(--prim); font-size:14px; margin-bottom:16px;">Delivery Method</p>
-                <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><small>Free</small></div><span>R0</span></div>
-                <div id="p-60" class="paxi-chip" onclick="ENGINE.setPaxi(60, 'Standard PAXI')"><div><b>Standard</b><small>7-9 Days</small></div><span>R60</span></div>
-                <div id="p-100" class="paxi-chip express-pulse" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
+                <p style="font-weight:700; color:var(--prim); font-size:14px; margin-bottom:16px; text-transform:uppercase;">Delivery Method</p>
+                <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><small>Free • Ready in 24h</small></div><span>R0</span></div>
+                <div id="p-60" class="paxi-chip" onclick="ENGINE.setPaxi(60, 'Standard PAXI')"><div><b>Standard</b><small>7-9 Business Days</small></div><span>R60</span></div>
+                <div id="p-100" class="paxi-chip" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
                     <div class="popular-badge"><span class="material-symbols-rounded" style="font-size:14px;">speed</span> Popular</div>
-                    <div><b>Express</b><small>3-5 Days</small></div><span>R100</span>
+                    <div><b>Express</b><small>3-5 Business Days</small></div><span>R100</span>
                 </div>
             </div>
             <div class="sticky-footer">
@@ -116,7 +118,6 @@
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div class="scroll-area">
                 <div id="printable-receipt" class="receipt-card">
-                    <div class="paid-watermark" id="paid-stamp">PAID GPAY</div>
                     <div style="text-align:center; margin-bottom:24px;">
                         <img src="logo.jpg" style="width:64px; border-radius:16px;">
                         <h2 style="margin:12px 0 4px;">Otaku Beads</h2>
@@ -154,13 +155,30 @@
                     const label = this.clean(f); const p = label.toLowerCase().includes('keychain') ? 50 : 40;
                     return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${label}</b><br>R${p}<button class="btn-m3" style="margin-top:10px;" onclick="ENGINE.add('${f}',${p})">Add</button></div></div>`;
                 }).join('');
+                this.setupIdentity();
                 this.initGPay();
+            },
+            setupIdentity() {
+                if (typeof google === "undefined") return setTimeout(() => this.setupIdentity(), 500);
+                google.accounts.id.initialize({
+                    client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
+                    ux_mode: "popup",
+                    callback: (r) => { localStorage.setItem('user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
+                });
+                const user = JSON.parse(localStorage.getItem('user'));
+                const anchor = document.getElementById('g_id_anchor');
+                if(user) {
+                    anchor.onclick = () => { localStorage.removeItem('user'); location.reload(); };
+                    document.getElementById('g_id_btn').innerHTML = `<div style="display:flex; align-items:center;"><img src="${user.picture}" style="width:26px; height:26px; border-radius:50%;"><span class="signout-label">Sign Out</span></div>`;
+                } else {
+                    google.accounts.id.renderButton(document.getElementById("g_id_btn"), { theme: "outline", size: "small", shape: "pill" });
+                }
             },
             initGPay() {
                 if (typeof google === "undefined" || !google.payments) return setTimeout(() => this.initGPay(), 500);
                 const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
                 const button = paymentsClient.createButton({
-                    onClick: () => { document.getElementById('paid-stamp').style.display = 'block'; ENGINE.genReceipt(); },
+                    onClick: () => ENGINE.genReceipt(),
                     buttonColor: 'black', buttonType: 'buy'
                 });
                 document.getElementById('gpay-container').appendChild(button);
@@ -171,9 +189,10 @@
                 let sub = 0; let html = '';
                 for(let n in this.cart) {
                     sub += (this.cart[n].p * this.cart[n].qty);
-                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
+                    html += `<div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;"><img src="${n}" class="thumb" onerror="this.src='logo.jpg'"><div style="flex:1;"><b>${this.clean(n)}</b><br>R${this.cart[n].p}</div><div>x${this.cart[n].qty}</div></div>`;
                 }
                 this.subTotal = sub;
+                document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('check-sub').innerText = 'R' + (sub + this.paxiPrice);
                 document.getElementById('checkout-list').innerHTML = html || 'Bag Empty';
             },
@@ -188,8 +207,9 @@
                 UI.open('receipt');
             },
             checkoutWA() {
+                const user = JSON.parse(localStorage.getItem('user')) || {name: "Customer"};
                 let list = ""; for(let n in this.cart) { list += `${this.clean(n)} (x${this.cart[n].qty})\n`; }
-                const msg = `⚓ OTAKU BEADS ORDER\n\n${list}\nDelivery: ${this.paxiName}\nTotal Due: R${this.subTotal + this.paxiPrice}`;
+                const msg = `⚓ OTAKU BEADS ORDER\nName: ${user.name}\n\n${list}\nDelivery: ${this.paxiName}\nTotal Due: R${this.subTotal + this.paxiPrice}`;
                 window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`);
             }
         };
