@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | Google Engine</title>
+    <title>Otaku Beads | Secure M3</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -14,7 +14,8 @@
         header { position: sticky; top: 0; background: rgba(15,13,19,0.95); backdrop-filter: blur(20px); padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 5000; display: flex; justify-content: space-between; align-items: center; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; max-height: 90vh; overflow-y: auto; padding-bottom: 40px; }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -34,50 +35,55 @@
 
     <div id="checkout-overlay" class="sheet-overlay" onclick="UI.close()">
         <div class="sheet-content" onclick="event.stopPropagation()">
-            <div style="padding:24px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2>Your Bag</h2>
-                    <span class="material-symbols-rounded" onclick="UI.close()">close</span>
-                </div>
-                <div id="bag-list"></div>
-                <div id="gpay-container" style="margin-top:40px; min-height:50px;"></div>
-            </div>
+            <h2>Your Bag</h2>
+            <div id="bag-list" style="margin-bottom:24px;"></div>
+            <div id="payment-zone"></div>
         </div>
     </div>
 
     <script>
-        const UI = {
-            open() { const o = document.getElementById('checkout-overlay'); o.style.display = 'flex'; setTimeout(() => o.classList.add('active'), 10); ENGINE.initGPay(); },
-            close() { const o = document.getElementById('checkout-overlay'); o.classList.remove('active'); setTimeout(() => o.style.display = 'none', 300); }
-        };
-
         const ENGINE = {
+            user: null,
             cart: {},
-            init() { 
-                this.render(); 
-                this.initGoogle();
+            init() {
+                this.setupAuth();
+                this.renderItems();
             },
-            initGoogle() {
+            setupAuth() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.accounts) return setTimeout(check, 500);
-                    google.accounts.id.initialize({ client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com" });
-                    google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle" });
+                    google.accounts.id.initialize({ 
+                        client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com", 
+                        callback: (r) => { 
+                            this.user = JSON.parse(atob(r.credential.split('.')[1]));
+                            localStorage.setItem('otaku_session', JSON.stringify(this.user));
+                            location.reload();
+                        }
+                    });
+                    this.user = JSON.parse(localStorage.getItem('otaku_session'));
+                    if(this.user) document.getElementById("g_id_btn").innerHTML = `<img src="${this.user.picture}" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--prim);">`;
+                    else google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle" });
                 };
                 check();
             },
-            initGPay() {
-                const container = document.getElementById('gpay-container');
-                if (typeof google !== "undefined" && google.payments) {
+            initPayment() {
+                const zone = document.getElementById('payment-zone');
+                if (this.user) {
+                    // Signed In: Google Pay Enabled
                     const client = new google.payments.api.PaymentsClient({environment: 'PRODUCTION'});
-                    const btn = client.createButton({ onClick: () => window.open('https://wa.me/27663443753', '_blank') });
-                    container.innerHTML = '';
-                    container.appendChild(btn);
+                    const btn = client.createButton({ onClick: () => console.log("GPay Processing...") });
+                    zone.innerHTML = '<p style="margin-bottom:12px; opacity:0.7;">Secure Checkout via Google Pay</p>';
+                    zone.appendChild(btn);
                 } else {
-                    container.innerHTML = '<p style="color:var(--prim)">Connecting to Google Engine...</p>';
-                    setTimeout(() => this.initGPay(), 1000);
+                    // Guest: WhatsApp Mode Only
+                    zone.innerHTML = `
+                        <p style="margin-bottom:12px; color:var(--prim);">Guest Mode: WhatsApp Checkout</p>
+                        <button class="btn-m3" onclick="window.open('https://wa.me/27663443753', '_blank')">
+                            Order via WhatsApp
+                        </button>`;
                 }
             },
-            render() {
+            renderItems() {
                 const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
                 document.getElementById('store-grid').innerHTML = items.map(f => {
                     const p = f.toLowerCase().includes('keychain') ? 50 : 40;
@@ -90,14 +96,19 @@
                 if(!this.cart[n]) this.cart[n] = {p, qty:0};
                 this.cart[n].qty++;
                 let total = 0;
-                let html = '';
-                for(let k in this.cart) {
-                    total += (this.cart[k].p * this.cart[k].qty);
-                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${k} x${this.cart[k].qty}</span><b>R${this.cart[k].p * this.cart[k].qty}</b></div>`;
-                }
+                for(let k in this.cart) total += (this.cart[k].p * this.cart[k].qty);
                 document.getElementById('bag-count').innerText = 'R' + total;
-                document.getElementById('bag-list').innerHTML = html;
+                this.updateBagUI();
+            },
+            updateBagUI() {
+                let html = '';
+                for(let k in this.cart) html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${k} x${this.cart[k].qty}</span><b>R${this.cart[k].p * this.cart[k].qty}</b></div>`;
+                document.getElementById('bag-list').innerHTML = html || 'Your bag is empty';
             }
+        };
+        const UI = {
+            open() { document.getElementById('checkout-overlay').style.display = 'flex'; setTimeout(() => document.getElementById('checkout-overlay').classList.add('active'), 10); ENGINE.initPayment(); },
+            close() { document.getElementById('checkout-overlay').classList.remove('active'); setTimeout(() => document.getElementById('checkout-overlay').style.display = 'none', 300); }
         };
         ENGINE.init();
     </script>
