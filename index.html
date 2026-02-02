@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V334</title>
+    <title>Otaku Beads | V335</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet">
@@ -44,6 +44,16 @@
             display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
         }
 
+        /* PAXI M3 Elements */
+        .paxi-chip {
+            padding: 16px; background: var(--surf); border: 2px solid transparent; 
+            border-radius: 20px; margin-bottom: 12px; cursor: pointer;
+            transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center;
+        }
+        .paxi-chip.active { border-color: var(--prim); background: rgba(208,188,255,0.05); }
+        .paxi-chip b { color: var(--prim); font-size: 14px; }
+        .paxi-chip small { opacity: 0.6; display: block; margin-top: 4px; }
+
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -79,17 +89,24 @@
                 <h2 style="margin:0;">Your Bag</h2>
                 <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;">×</button>
             </div>
-            <div class="scroll-area" id="checkout-list"></div>
-            <div style="padding:0 24px 20px;">
-                <p style="font-weight:700; color:var(--prim); font-size:14px; margin-bottom:12px;">Delivery Method</p>
-                <div id="p-0" onclick="ENGINE.setPaxi(0, 'Collection')" style="padding:16px; background:var(--out); border-radius:16px; margin-bottom:10px; cursor:pointer; border: 2px solid transparent;">Collection (R0)</div>
-                <div id="p-60" onclick="ENGINE.setPaxi(60, 'Standard PAXI')" style="padding:16px; background:var(--out); border-radius:16px; margin-bottom:10px; cursor:pointer; border: 2px solid transparent;">Standard PAXI (R60)</div>
+            <div class="scroll-area">
+                <div id="checkout-list"></div>
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:24px 0;">
+                <p style="font-weight:700; color:var(--prim); font-size:14px; margin-bottom:16px; text-transform:uppercase; letter-spacing:1px;">Delivery Method</p>
+                <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')">
+                    <div><b>In-Person Collection</b><small>Free • Ready in 24h</small></div>
+                    <span>R0</span>
+                </div>
+                <div id="p-60" class="paxi-chip" onclick="ENGINE.setPaxi(60, 'Standard PAXI')">
+                    <div><b>Standard PAXI</b><small>7-9 Business Days</small></div>
+                    <span>R60</span>
+                </div>
             </div>
             <div class="sticky-footer">
                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700;">
-                    <span>Total (Est)</span><span id="check-sub">R0</span>
+                    <span>Subtotal + Delivery</span><span id="check-sub">R0</span>
                 </div>
-                <button class="btn-m3" onclick="ENGINE.genReceipt()">Finalize & View Receipt</button>
+                <button class="btn-m3" onclick="ENGINE.genReceipt()">Preview Visual Receipt</button>
             </div>
         </div>
     </div>
@@ -97,7 +114,7 @@
     <div id="receipt-overlay" class="sheet-overlay" onclick="UI.close('receipt')">
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0;">Order Receipt</h2>
+                <h2 style="margin:0;">Final Receipt</h2>
                 <button onclick="UI.close('receipt')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;">×</button>
             </div>
             <div class="scroll-area">
@@ -110,10 +127,10 @@
                     <div id="receipt-items"></div>
                     <hr style="border:0; border-top:1px dashed #ddd; margin:16px 0;">
                     <div style="font-size:14px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Subtotal</span><span id="r-sub"></span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Paxi Delivery</span><span id="r-paxi"></span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Items Total</span><span id="r-sub"></span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-weight:700;"><span>Delivery (<span id="r-p-name"></span>)</span><span id="r-paxi"></span></div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>VAT (15%)</span><span id="r-vat"></span></div>
-                        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; margin-top:12px; color:#1B5E20; border-top:2px solid #eee; padding-top:12px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; margin-top:12px; color:#1B5E20; border-top:2px solid #eee; padding-top:12px;">
                             <span>Total Due</span><span id="r-total"></span>
                         </div>
                     </div>
@@ -121,7 +138,7 @@
             </div>
             <div class="sticky-footer no-print">
                 <button class="btn-m3 btn-outline" onclick="UI.close('receipt')">← Back to Bag</button>
-                <button class="btn-m3" style="background:var(--out); color:white; margin-bottom:12px;" onclick="window.print()">Save PDF</button>
+                <button class="btn-m3" style="background:var(--out); color:white; margin-bottom:12px;" onclick="window.print()">Download Receipt (PDF)</button>
                 <button class="btn-m3" style="background:#25D366; color:white;" onclick="ENGINE.checkout()">Send Order via WhatsApp</button>
             </div>
         </div>
@@ -135,11 +152,10 @@
 
         const ENGINE = {
             cart: {}, paxiPrice: 0, paxiName: 'Collection',
-            // File list corrected: Usopp is Usopp.jpg but labeled as bracelet
             items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             clean(name) { 
                 let n = name.split('.')[0].replace(/[_-]/g, ' '); 
-                if(n === "Usopp") n = "Usopp bracelet"; // Forced label fix
+                if(n === "Usopp") n = "Usopp bracelet";
                 return n;
             },
             init() {
@@ -180,8 +196,8 @@
             mod(n, d) { if(this.cart[n]) { this.cart[n].qty += d; if(this.cart[n].qty <= 0) delete this.cart[n]; this.update(); } },
             setPaxi(p, n) { 
                 this.paxiPrice = p; this.paxiName = n; 
-                document.getElementById('p-0').style.borderColor = p === 0 ? 'var(--prim)' : 'transparent';
-                document.getElementById('p-60').style.borderColor = p === 60 ? 'var(--prim)' : 'transparent';
+                document.getElementById('p-0').classList.toggle('active', p === 0);
+                document.getElementById('p-60').classList.toggle('active', p === 60);
                 this.update(); 
             },
             update() {
@@ -201,10 +217,10 @@
                 this.subTotal = sub;
                 document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('check-sub').innerText = 'R' + (sub + this.paxiPrice);
-                document.getElementById('checkout-list').innerHTML = html || '<p style="text-align:center; opacity:0.6;">Bag Empty</p>';
+                document.getElementById('checkout-list').innerHTML = html || '<p style="text-align:center; opacity:0.6;">Your bag is empty</p>';
             },
             genReceipt() {
-                if(this.subTotal <= 0) return;
+                if(this.subTotal <= 0) return alert("Add items to your bag first.");
                 let html = '';
                 for(let n in this.cart) {
                     html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px; color:black;">
@@ -216,6 +232,7 @@
                 const vat = (grand * 0.15);
                 const final = (grand + vat).toFixed(2);
                 document.getElementById('receipt-items').innerHTML = html;
+                document.getElementById('r-p-name').innerText = this.paxiName;
                 document.getElementById('r-sub').innerText = 'R' + this.subTotal;
                 document.getElementById('r-paxi').innerText = 'R' + this.paxiPrice;
                 document.getElementById('r-vat').innerText = 'R' + vat.toFixed(2);
