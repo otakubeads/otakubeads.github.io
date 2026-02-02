@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V348</title>
+    <title>Otaku Beads | V350</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -52,7 +52,7 @@
             <div class="scroll-area">
                 <div id="checkout-list"></div>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:24px 0;">
-                <p style="font-weight:700; color:var(--prim); font-size:12px; text-transform:uppercase;">Delivery Choice</p>
+                <p style="font-weight:700; color:var(--prim); font-size:12px; text-transform:uppercase;">Delivery Method</p>
                 <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><small>Free • Cape Town</small></div><span>R0</span></div>
                 <div id="p-100" class="paxi-chip" onclick="ENGINE.setPaxi(100, 'Express PAXI')"><div><b>Express</b><small>3-5 Days</small></div><span>R100</span></div>
             </div>
@@ -71,7 +71,7 @@
                 <button style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;" onclick="UI.close('receipt')">×</button>
             </div>
             <div class="scroll-area">
-                <div id="receipt-body" class="receipt-card">
+                <div class="receipt-card">
                     <div style="text-align:center; margin-bottom:20px;"><img src="logo.jpg" style="width:50px; border-radius:12px;"></div>
                     <div id="receipt-items"></div>
                     <div id="receipt-totals" style="margin-top:16px; border-top:2px solid #eee; padding-top:12px;"></div>
@@ -88,7 +88,7 @@
         };
 
         const ENGINE = {
-            cart: {}, paxiPrice: 0, paxiName: 'Collection',
+            cart: {}, paxiPrice: 0, paxiName: 'Collection', paymentsClient: null,
             items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
             clean(n) { return n.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : n.split('.')[0].replace(/[_-]/g, ' '); },
             init() {
@@ -117,25 +117,30 @@
             initGPay() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    const client = new google.payments.api.PaymentsClient({environment: 'TEST'});
-                    const btn = client.createButton({ onClick: () => ENGINE.processGPay(), buttonColor: 'black', buttonType: 'buy', buttonSizeMode: 'fill' });
+                    this.paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+                    const btn = this.paymentsClient.createButton({ onClick: () => ENGINE.processGPay(), buttonColor: 'black', buttonType: 'buy', buttonSizeMode: 'fill' });
                     document.getElementById('gpay-btn-container').innerHTML = '';
                     document.getElementById('gpay-btn-container').appendChild(btn);
                 };
                 check();
             },
             processGPay() {
-                ENGINE.genReceipt('GPAY_LOCK'); // Lock UI while processing
-                setTimeout(() => { 
-                    ENGINE.genReceipt('GPAY_DONE'); // Show success
-                    setTimeout(() => ENGINE.checkoutWA(true), 2000); // Only then redirect
-                }, 1500);
+                const paymentDataRequest = {
+                    apiVersion: 2, apiVersionMinor: 0,
+                    allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'], allowedCardNetworks: ['VISA', 'MASTERCARD'] }, tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'exampleGatewayMerchantId' } } }],
+                    transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: String(this.subTotal + this.paxiPrice), currencyCode: 'ZAR', countryCode: 'ZA' },
+                    merchantInfo: { merchantName: 'Otaku Beads' }
+                };
+                this.paymentsClient.loadPaymentData(paymentDataRequest).then(data => {
+                    ENGINE.genReceipt('GPAY_DONE');
+                    setTimeout(() => ENGINE.checkoutWA(true), 2000);
+                }).catch(err => console.log('Payment sheet closed', err));
             },
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
             setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; [0, 100].forEach(v => document.getElementById('p-'+v).classList.toggle('active', v === p)); this.update(); },
             update() {
                 let sub = 0; let html = '';
-                for(let n in this.cart) { sub += (this.cart[n].p * this.cart[n].qty); html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`; }
+                for(let n in this.cart) { sub += (this.cart[n].p * this.cart[n].qty); html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`; }
                 this.subTotal = sub; document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('check-sub').innerText = 'R' + (sub + this.paxiPrice);
                 document.getElementById('checkout-list').innerHTML = html || 'Bag is empty';
@@ -145,9 +150,7 @@
                 document.getElementById('receipt-items').innerHTML = document.getElementById('checkout-list').innerHTML;
                 document.getElementById('receipt-totals').innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#666;"><span>Delivery (${this.paxiName})</span><span>R${this.paxiPrice}</span></div><div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; color:#1B5E20; border-top:1px solid #eee; padding-top:8px;"><span>Total Due</span><span>R${this.subTotal + this.paxiPrice}</span></div>`;
                 const footer = document.getElementById('receipt-footer');
-                
-                if(mode === 'GPAY_LOCK') { footer.innerHTML = `<p style="text-align:center; color:var(--prim); font-weight:700;">Processing GPay Heavy Lifting...</p>`; }
-                else if(mode === 'GPAY_DONE') { footer.innerHTML = `<p style="text-align:center; color:#4CAF50; font-weight:700;">✅ Payment Success! Sending Receipt...</p>`; }
+                if(mode === 'GPAY_DONE') { footer.innerHTML = `<p style="text-align:center; color:#4CAF50; font-weight:700;">✅ Payment Success! Sending Receipt...</p>`; }
                 else { footer.innerHTML = `<button class="btn-m3" style="background:#25D366; color:white;" onclick="ENGINE.checkoutWA(false)">Confirm & WhatsApp</button>`; }
                 UI.open('receipt');
             },
@@ -156,7 +159,6 @@
                 const user = JSON.parse(localStorage.getItem('otaku_user')) || {name: "Customer"};
                 const status = isPaid ? "✅ PAID VIA GPAY" : "⏳ MANUAL ORDER";
                 const msg = `⚓ OTAKU BEADS ORDER\nCustomer: ${user.name}\nStatus: ${status}\n\n${list}Delivery: ${this.paxiName}\nTotal Due: R${this.subTotal + this.paxiPrice}`;
-                // Using universal link to avoid app picker bugs
                 window.location.href = `whatsapp://send?phone=27663443753&text=${encodeURIComponent(msg)}`;
             }
         };
