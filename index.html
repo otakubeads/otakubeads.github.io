@@ -21,10 +21,6 @@
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
-        .paxi-card { background: var(--surf); padding: 16px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .paxi-card.active { border-color: var(--prim); background: rgba(208,188,255,0.08); }
-        .promo-input { width: 100%; background: var(--bg); border: 1px solid var(--out); color: white; padding: 16px; border-radius: 16px; font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        .promo-input:focus { border-color: var(--prim); }
     </style>
 </head>
 <body>
@@ -48,26 +44,10 @@
                 <h2 style="margin:0;">Your Bag</h2>
                 <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; border-radius:20px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;"><span class="material-symbols-rounded">close</span></button>
             </div>
-            <div style="flex:1; overflow-y:auto; padding:0 24px;">
-                <div id="checkout-list"></div>
-                <div style="margin-top:24px;">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim); margin-bottom:12px;">DELIVERY METHOD</p>
-                    <div id="paxi-0" class="paxi-card active" onclick="ENGINE.setPaxi(0, 'Collection')">
-                        <div><b>Store Collection</b><br><small>Cape Town</small></div><span>Free</span>
-                    </div>
-                    <div id="paxi-100" class="paxi-card" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
-                        <div><b>Express PAXI</b><br><small>3-5 Days</small></div><span>R100</span>
-                    </div>
-                </div>
-                <div style="margin-top:24px; padding:20px; background:var(--surf); border-radius:24px;">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim); margin-bottom:12px;">PROMO CODE</p>
-                    <input type="text" class="promo-input" placeholder="Paste your gift code..." oninput="ENGINE.applyPromo(this.value)">
-                    <p id="promo-msg" style="font-size:11px; margin:8px 0 0 4px; color:#81C784; display:none;">Discount Applied!</p>
-                </div>
-            </div>
+            <div id="checkout-list" style="flex:1; overflow-y:auto; padding:0 24px;"></div>
             <div style="padding:24px; background:#1C1921; border-top:1px solid var(--out);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                    <b>Total (ZAR)</b>
+                    <b>Total</b>
                     <b id="check-total" style="color:var(--prim); font-size:24px;">R0</b>
                 </div>
                 <div id="gpay-container"></div>
@@ -82,8 +62,12 @@
         };
 
         const ENGINE = {
-            cart: {}, paxiPrice: 0, discount: 0,
-            init() { this.setupGoogle(); this.renderStore(); this.setupGPay(); },
+            cart: {},
+            init() { 
+                this.setupGoogle(); 
+                this.renderStore(); 
+                this.setupGPay(); 
+            },
             setupGoogle() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.accounts) return setTimeout(check, 500);
@@ -108,31 +92,27 @@
                 const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
                 document.getElementById('store-grid').innerHTML = items.map(f => {
                     const p = f.toLowerCase().includes('keychain') ? 50 : 40;
-                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${f.split('.')[0]}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})"><span class="material-symbols-rounded">add</span> Add</button></div></div>`;
+                    // Remove underscores and fix Usopp Bracelet naming
+                    let name = f.split('.')[0].replace(/_/g, ' ');
+                    if (name.toLowerCase() === "usopp") name = "Usopp Bracelet";
+                    
+                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${name}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p},'${name}')"><span class="material-symbols-rounded">add</span> Add</button></div></div>`;
                 }).join('');
             },
-            add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
-            setPaxi(p) { this.paxiPrice = p; document.getElementById('paxi-0').classList.toggle('active', p===0); document.getElementById('paxi-100').classList.toggle('active', p===100); this.update(); },
-            applyPromo(val) {
-                if(val.toUpperCase() === "OTAKU30") {
-                    this.discount = 0.30;
-                    document.getElementById('promo-msg').style.display = 'block';
-                } else {
-                    this.discount = 0;
-                    document.getElementById('promo-msg').style.display = 'none';
-                }
-                this.update();
+            add(file, price, name) { 
+                if(!this.cart[file]) this.cart[file] = {price, name, qty:0}; 
+                this.cart[file].qty++; 
+                this.update(); 
             },
             update() {
                 let sub = 0; let html = '';
-                for(let n in this.cart) { 
-                    sub += (this.cart[n].p * this.cart[n].qty);
-                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${n.split('.')[0]} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
+                for(let key in this.cart) { 
+                    sub += (this.cart[key].price * this.cart[key].qty);
+                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${this.cart[key].name} x${this.cart[key].qty}</span><span>R${this.cart[key].price * this.cart[key].qty}</span></div>`;
                 }
-                const total = Math.round((sub * (1 - this.discount)) + this.paxiPrice);
-                document.getElementById('bag-count').innerText = 'R' + total;
-                document.getElementById('check-total').innerText = 'R' + total;
-                document.getElementById('checkout-list').innerHTML = html || 'Empty';
+                document.getElementById('bag-count').innerText = 'R' + sub;
+                document.getElementById('check-total').innerText = 'R' + sub;
+                document.getElementById('checkout-list').innerHTML = html || 'Bag is empty';
             }
         };
         ENGINE.init();
