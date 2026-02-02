@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Otaku Beads | V341</title>
+    <title>Otaku Beads | V343</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script src="https://pay.google.com/gp/p/js/pay.js" async></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -26,8 +26,8 @@
             padding: 4px 10px; display: flex; align-items: center; height: 34px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
         }
-        .signout-label { font-size: 12px; font-weight: 700; color: var(--prim); margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
+        .signout-label { font-size: 12px; font-weight: 700; color: var(--prim); margin-left: 8px; text-transform: uppercase; }
+
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         
@@ -36,14 +36,13 @@
             background: var(--prim); color: var(--on-prim); width: 100%; 
             cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
+        .btn-outline { background: transparent; border: 1px solid var(--out); color: var(--prim); }
 
         #bag-fab { 
             position: fixed; bottom: 24px; right: 20px; background: var(--prim); color: var(--on-prim); 
             padding: 16px 24px; border-radius: 24px; font-weight: 800; border: none; z-index: 6000; 
             display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
         }
-
-        #gpay-container { margin-top: 12px; width: 100%; height: 48px; border-radius: 24px; overflow: hidden; }
 
         .paxi-chip {
             padding: 16px; background: var(--surf); border: 2px solid transparent; 
@@ -61,15 +60,24 @@
             text-transform: uppercase; position: absolute; top: -10px; right: 12px;
         }
 
+        @keyframes premium-glow {
+            0% { border-color: rgba(208,188,255,0.1); }
+            50% { border-color: rgba(208,188,255,0.4); }
+            100% { border-color: rgba(208,188,255,0.1); }
+        }
+        .express-pulse:not(.active) { animation: premium-glow 2s infinite ease-in-out; }
+
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
         
         .scroll-area { flex: 1; overflow-y: auto; padding: 24px; }
-        .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); }
+        .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); display: flex; flex-direction: column; gap: 12px; }
         
-        .receipt-card { background: white; color: black; padding: 28px; border-radius: 24px; margin-bottom: 20px; position: relative; }
+        .receipt-card { background: white; color: black; padding: 28px; border-radius: 24px; margin-bottom: 20px; }
         .thumb { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
+        
+        #gpay-btn-container { min-height: 48px; border-radius: 24px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -91,50 +99,42 @@
         <div class="sheet-content" onclick="event.stopPropagation()">
             <div style="padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="margin:0;">Your Bag</h2>
-                <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;">×</button>
+                <button style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;" onclick="UI.close('checkout')">×</button>
             </div>
             <div class="scroll-area">
                 <div id="checkout-list"></div>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:24px 0;">
                 <p style="font-weight:700; color:var(--prim); font-size:14px; margin-bottom:16px; text-transform:uppercase;">Delivery Method</p>
-                <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><small>Free • Ready in 24h</small></div><span>R0</span></div>
-                <div id="p-60" class="paxi-chip" onclick="ENGINE.setPaxi(60, 'Standard PAXI')"><div><b>Standard</b><small>7-9 Business Days</small></div><span>R60</span></div>
-                <div id="p-100" class="paxi-chip" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
+                <div id="p-0" class="paxi-chip active" onclick="ENGINE.setPaxi(0, 'Collection')"><div><b>Collection</b><small>Free • 24h</small></div><span>R0</span></div>
+                <div id="p-60" class="paxi-chip" onclick="ENGINE.setPaxi(60, 'Standard PAXI')"><div><b>Standard</b><small>7-9 Days</small></div><span>R60</span></div>
+                <div id="p-100" class="paxi-chip express-pulse" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
                     <div class="popular-badge"><span class="material-symbols-rounded" style="font-size:14px;">speed</span> Popular</div>
-                    <div><b>Express</b><small>3-5 Business Days</small></div><span>R100</span>
+                    <div><b>Express</b><small>3-5 Days</small></div><span>R100</span>
                 </div>
             </div>
             <div class="sticky-footer">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700;">
-                    <span>Total Due</span><span id="check-sub">R0</span>
-                </div>
-                <button class="btn-m3" onclick="ENGINE.genReceipt()">Manual Order (WhatsApp)</button>
-                <div id="gpay-container"></div>
+                <div style="display:flex; justify-content:space-between; font-weight:700;"><span>Total Due</span><span id="check-sub">R0</span></div>
+                <button class="btn-m3" onclick="ENGINE.genReceipt()">Manual Order Preview</button>
+                <div id="gpay-btn-container"></div>
             </div>
         </div>
     </div>
 
     <div id="receipt-overlay" class="sheet-overlay" onclick="UI.close('receipt')">
         <div class="sheet-content" onclick="event.stopPropagation()">
+            <div style="padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">Review Order</h2>
+                <button style="background:var(--out); border:none; color:white; width:40px; height:40px; border-radius:20px;" onclick="UI.close('receipt')">×</button>
+            </div>
             <div class="scroll-area">
                 <div id="printable-receipt" class="receipt-card">
-                    <div style="text-align:center; margin-bottom:24px;">
-                        <img src="logo.jpg" style="width:64px; border-radius:16px;">
-                        <h2 style="margin:12px 0 4px;">Otaku Beads</h2>
-                        <small style="color:#666; font-size:10px;">Official Receipt</small>
-                    </div>
+                    <div style="text-align:center; margin-bottom:20px;"><img src="logo.jpg" style="width:50px; border-radius:12px;"></div>
                     <div id="receipt-items"></div>
-                    <div style="font-size:14px; margin-top:16px; border-top:2px solid #eee; padding-top:12px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Items Total</span><span id="r-sub"></span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Delivery (<span id="r-p-name"></span>)</span><span id="r-paxi"></span></div>
-                        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; margin-top:8px; color:#1B5E20; border-top:2px solid #eee; padding-top:12px;">
-                            <span>Total Due</span><span id="r-total"></span>
-                        </div>
-                    </div>
+                    <div id="receipt-totals" style="margin-top:16px; border-top:2px solid #eee; padding-top:12px;"></div>
                 </div>
             </div>
             <div class="sticky-footer">
-                <button class="btn-m3" style="background:var(--out); color:white; margin-bottom:12px;" onclick="window.print()">Download PDF</button>
+                <button class="btn-m3 btn-outline" onclick="UI.close('receipt')">← Back to Bag</button>
                 <button class="btn-m3" style="background:#25D366; color:white;" onclick="ENGINE.checkoutWA()">Send to WhatsApp</button>
             </div>
         </div>
@@ -149,7 +149,7 @@
         const ENGINE = {
             cart: {}, paxiPrice: 0, paxiName: 'Collection',
             items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
-            clean(name) { let n = name.split('.')[0].replace(/[_-]/g, ' '); return n === "Usopp" ? "Usopp bracelet" : n; },
+            clean(n) { let name = n.split('.')[0].replace(/[_-]/g, ' '); return name === "Usopp" ? "Usopp bracelet" : name; },
             init() {
                 document.getElementById('store-grid').innerHTML = this.items.map(f => {
                     const label = this.clean(f); const p = label.toLowerCase().includes('keychain') ? 50 : 40;
@@ -159,29 +159,25 @@
                 this.initGPay();
             },
             setupIdentity() {
-                if (typeof google === "undefined") return setTimeout(() => this.setupIdentity(), 500);
+                if (typeof google === "undefined" || !google.accounts) return setTimeout(() => this.setupIdentity(), 500);
                 google.accounts.id.initialize({
                     client_id: "919544111369-2hhnhfnsc0hvrgnq1dn8fjc8ca3im7jv.apps.googleusercontent.com",
                     ux_mode: "popup",
                     callback: (r) => { localStorage.setItem('user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
                 });
                 const user = JSON.parse(localStorage.getItem('user'));
-                const anchor = document.getElementById('g_id_anchor');
-                if(user) {
-                    anchor.onclick = () => { localStorage.removeItem('user'); location.reload(); };
-                    document.getElementById('g_id_btn').innerHTML = `<div style="display:flex; align-items:center;"><img src="${user.picture}" style="width:26px; height:26px; border-radius:50%;"><span class="signout-label">Sign Out</span></div>`;
-                } else {
-                    google.accounts.id.renderButton(document.getElementById("g_id_btn"), { theme: "outline", size: "small", shape: "pill" });
-                }
+                if(user) document.getElementById('g_id_btn').innerHTML = `<div style="display:flex; align-items:center;"><img src="${user.picture}" style="width:26px; height:26px; border-radius:50%;"><span class="signout-label">Sign Out</span></div>`;
+                else google.accounts.id.renderButton(document.getElementById("g_id_btn"), { theme: "outline", size: "small", shape: "pill" });
             },
             initGPay() {
                 if (typeof google === "undefined" || !google.payments) return setTimeout(() => this.initGPay(), 500);
-                const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-                const button = paymentsClient.createButton({
-                    onClick: () => ENGINE.genReceipt(),
-                    buttonColor: 'black', buttonType: 'buy'
+                const client = new google.payments.api.PaymentsClient({environment: 'TEST'});
+                const btn = client.createButton({
+                    onClick: () => { if(this.subTotal > 0) ENGINE.genReceipt(); },
+                    buttonColor: 'black', buttonType: 'buy', buttonSizeMode: 'fill'
                 });
-                document.getElementById('gpay-container').appendChild(button);
+                document.getElementById('gpay-btn-container').innerHTML = '';
+                document.getElementById('gpay-btn-container').appendChild(btn);
             },
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
             setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; ['p-0','p-60','p-100'].forEach(id => document.getElementById(id).classList.toggle('active', id === 'p-'+p)); this.update(); },
@@ -194,23 +190,20 @@
                 this.subTotal = sub;
                 document.getElementById('bag-count').innerText = 'R' + sub;
                 document.getElementById('check-sub').innerText = 'R' + (sub + this.paxiPrice);
-                document.getElementById('checkout-list').innerHTML = html || 'Bag Empty';
+                document.getElementById('checkout-list').innerHTML = html || '<p style="text-align:center; opacity:0.5;">Bag is empty</p>';
             },
             genReceipt() {
                 if(this.subTotal <= 0) return;
-                let html = ''; for(let n in this.cart) { html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; color:black;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`; }
+                let html = ''; let sub = 0;
+                for(let n in this.cart) { let cost = this.cart[n].p * this.cart[n].qty; sub += cost; html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; color:black;"><span>${this.clean(n)} x${this.cart[n].qty}</span><span>R${cost}</span></div>`; }
                 document.getElementById('receipt-items').innerHTML = html;
-                document.getElementById('r-p-name').innerText = this.paxiName;
-                document.getElementById('r-sub').innerText = 'R' + this.subTotal;
-                document.getElementById('r-paxi').innerText = 'R' + this.paxiPrice;
-                document.getElementById('r-total').innerText = 'R' + (this.subTotal + this.paxiPrice);
-                UI.open('receipt');
+                document.getElementById('receipt-totals').innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:4px; color:#666;"><span>Delivery (${this.paxiName})</span><span>R${this.paxiPrice}</span></div><div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; color:#1B5E20; border-top:1px solid #eee; padding-top:8px;"><span>Total Due</span><span>R${sub + this.paxiPrice}</span></div>`;
+                this.finalTotal = sub + this.paxiPrice; UI.open('receipt');
             },
             checkoutWA() {
                 const user = JSON.parse(localStorage.getItem('user')) || {name: "Customer"};
                 let list = ""; for(let n in this.cart) { list += `${this.clean(n)} (x${this.cart[n].qty})\n`; }
-                const msg = `⚓ OTAKU BEADS ORDER\nName: ${user.name}\n\n${list}\nDelivery: ${this.paxiName}\nTotal Due: R${this.subTotal + this.paxiPrice}`;
-                window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`);
+                window.open(`https://wa.me/27663443753?text=${encodeURIComponent("⚓ OTAKU BEADS ORDER\nName: "+user.name+"\n\n"+list+"Delivery: "+this.paxiName+"\nTotal Due: R"+this.finalTotal)}`);
             }
         };
         ENGINE.init();
