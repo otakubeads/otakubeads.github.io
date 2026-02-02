@@ -16,15 +16,13 @@
         .logo-img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
-        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .promo-banner { background: linear-gradient(135deg, #381E72, #6750A4); border: 1px solid var(--prim); padding: 24px; margin: 16px; border-radius: 28px; text-align: center; }
+        .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .promo-banner { background: linear-gradient(135deg, #381E72, #21005D); border: 1px solid var(--prim); padding: 24px; margin: 16px; border-radius: 28px; text-align: center; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
-        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+        .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; }
         .scroll-area { flex: 1; overflow-y: auto; padding: 24px; }
-        .paxi-card { background: var(--surf); padding: 16px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .paxi-card.active { border-color: var(--prim); background: rgba(208,188,255,0.08); }
-        .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); }
+        .icon { font-family: 'Material Symbols Rounded'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; display: inline-block; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -37,45 +35,33 @@
     </header>
 
     <div id="promo-area" class="promo-banner">
-        <h3 style="margin:0 0 8px 0; color:var(--prim);">Welcome Gift: 30% OFF</h3>
+        <span class="material-symbols-rounded" style="color:var(--prim); font-size:32px;">redeem</span>
+        <h3 style="margin:8px 0; color:var(--prim);">Welcome Gift: 30% OFF</h3>
         <p style="margin:0 0 20px 0; font-size:14px; opacity:0.9;">Claim your one-time discount code!</p>
-        <button class="btn-m3" style="height:44px; width:200px; margin:0 auto;" onclick="ENGINE.claimPromo()">Claim Now</button>
-        <p style="margin-top:12px; font-size:11px; opacity:0.6;">One use per device. Enjoy!</p>
+        <button class="btn-m3" style="height:44px; width:180px; margin:0 auto;" onclick="ENGINE.claimPromo()">
+            <span class="material-symbols-rounded">content_copy</span> Claim Now
+        </button>
     </div>
 
     <main id="store-grid" class="grid"></main>
 
-    <button id="bag-fab" style="position:fixed; bottom:24px; right:20px; background:var(--prim); border:none; padding:16px 24px; border-radius:28px; font-weight:800; color:var(--on-prim); z-index: 6000;" onclick="UI.open('checkout')">
-        🛒 <span id="bag-count">R0</span>
+    <button id="bag-fab" style="position:fixed; bottom:24px; right:20px; background:var(--prim); border:none; padding:16px 24px; border-radius:28px; font-weight:800; color:var(--on-prim); z-index: 6000; display:flex; align-items:center; gap:8px;" onclick="UI.open('checkout')">
+        <span class="material-symbols-rounded">shopping_bag</span> <span id="bag-count">R0</span>
     </button>
 
     <div id="checkout-overlay" class="sheet-overlay" onclick="UI.close('checkout')">
         <div class="sheet-content" onclick="event.stopPropagation()">
-            <div style="padding:24px; display:flex; justify-content:space-between;">
-                <h2>Your Bag</h2>
-                <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; border-radius:20px; width:40px; height:40px;">×</button>
+            <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">Your Bag</h2>
+                <button onclick="UI.close('checkout')" style="background:var(--out); border:none; color:white; border-radius:20px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
             </div>
-            <div class="scroll-area">
-                <div id="checkout-list"></div>
-                <div style="margin-top:24px;">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim);">DELIVERY</p>
-                    <div id="paxi-0" class="paxi-card active" onclick="ENGINE.setPaxi(0, 'Collection')">
-                        <div><b>Store Collection</b><br><small>Cape Town</small></div><span>Free</span>
-                    </div>
-                    <div id="paxi-100" class="paxi-card" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
-                        <div><b>Express PAXI</b><br><small>3-5 Days</small></div><span>R100</span>
-                    </div>
-                </div>
-                <div style="margin-top:24px; padding:20px; background:var(--surf); border-radius:24px;">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim);">PROMO CODE</p>
-                    <input type="text" id="promo-box" style="width:100%; background:var(--bg); border:1px solid var(--out); color:white; padding:14px; border-radius:12px; box-sizing:border-box;" placeholder="Paste code here..." oninput="ENGINE.validateCode(this.value)">
-                    <p id="promo-status" style="font-size:12px; margin-top:8px;"></p>
-                </div>
-            </div>
-            <div class="sticky-footer">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div class="scroll-area" id="checkout-list"></div>
+            <div style="padding:24px; background:#1C1921; border-top:1px solid var(--out);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
                     <b>Total</b>
-                    <b id="check-total" style="font-size:24px; color:var(--prim);">R0</b>
+                    <b id="check-total" style="color:var(--prim); font-size:24px;">R0</b>
                 </div>
                 <div id="gpay-container"></div>
             </div>
@@ -89,7 +75,7 @@
         };
 
         const ENGINE = {
-            cart: {}, subTotal: 0, discount: 0, paxiPrice: 0,
+            cart: {}, subTotal: 0, 
             code: "BEADS-" + Math.random().toString(36).substr(2, 5).toUpperCase(),
             
             init() {
@@ -97,10 +83,9 @@
                 const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
                 document.getElementById('store-grid').innerHTML = items.map(f => {
                     const p = f.toLowerCase().includes('keychain') ? 50 : 40;
-                    const n = f.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : f.split('.')[0].replace(/[_-]/g, ' ');
-                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${n}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})">Add</button></div></div>`;
+                    const n = f.split('.')[0].replace(/[_-]/g, ' ');
+                    return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${n}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})"><span class="material-symbols-rounded">add</span> Add</button></div></div>`;
                 }).join('');
-                this.setupGPay();
             },
 
             setupGoogle() {
@@ -111,72 +96,29 @@
                         callback: (r) => { localStorage.setItem('otaku_user', JSON.stringify(JSON.parse(atob(r.credential.split('.')[1])))); location.reload(); }
                     });
                     const saved = JSON.parse(localStorage.getItem('otaku_user'));
-                    if(saved) document.getElementById("g_id_btn").innerHTML = `<img src="${saved.picture}" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--prim);" onclick="localStorage.removeItem('otaku_user'); location.reload();">`;
+                    if(saved) document.getElementById("g_id_btn").innerHTML = `<img src="${saved.picture}" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--prim);">`;
                     else google.accounts.id.renderButton(document.getElementById("g_id_btn"), { type: "icon", shape: "circle" });
                 };
                 check();
             },
 
-            async claimPromo() {
-                const id = btoa(navigator.userAgent + screen.width);
-                const burned = JSON.parse(localStorage.getItem('burned_promo') || '[]');
-                if(burned.includes(id)) {
-                    alert("This device has already claimed a welcome gift!");
-                    return;
-                }
+            claimPromo() {
                 navigator.clipboard.writeText(this.code);
-                burned.push(id);
-                localStorage.setItem('burned_promo', JSON.stringify(burned));
-                alert("Copied! Use code " + this.code + " at checkout for 30% off.");
-                document.getElementById('promo-area').innerHTML = `<h3 style="color:var(--prim);">Gift Claimed!</h3><p>Use your code before checking out.</p>`;
-            },
-
-            validateCode(val) {
-                const status = document.getElementById('promo-status');
-                if(val.trim().toUpperCase() === this.code) {
-                    this.discount = Math.floor(this.subTotal * 0.3);
-                    status.innerText = "30% Discount Applied!";
-                    status.style.color = "#81C784";
-                } else {
-                    this.discount = 0;
-                    status.innerText = "Invalid or expired code.";
-                    status.style.color = "var(--err)";
-                }
-                this.update();
-            },
-
-            setupGPay() {
-                const check = () => {
-                    if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    const client = new google.payments.api.PaymentsClient({environment: 'TEST'});
-                    const btn = client.createButton({ onClick: () => this.checkoutWA(), buttonColor: 'black', buttonType: 'buy' });
-                    document.getElementById('gpay-container').innerHTML = '';
-                    document.getElementById('gpay-container').appendChild(btn);
-                };
-                check();
+                alert("Code " + this.code + " copied! 30% discount is now active for your device.");
+                document.getElementById('promo-area').innerHTML = `<span class="material-symbols-rounded" style="color:var(--prim); font-size:32px;">verified</span><h3 style="color:var(--prim);">Gift Activated</h3><p>Your one-time discount is ready at checkout.</p>`;
             },
 
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
-            setPaxi(p, n) { this.paxiPrice = p; document.getElementById('paxi-0').classList.toggle('active', p===0); document.getElementById('paxi-100').classList.toggle('active', p===100); this.update(); },
-            
             update() {
                 let sub = 0; let html = '';
                 for(let n in this.cart) { 
-                    const name = n.split('.')[0].replace(/[_-]/g, ' ');
                     sub += (this.cart[n].p * this.cart[n].qty);
-                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;"><div style="display:flex; align-items:center;"><img src="${n}" style="width:40px; height:40px; border-radius:8px; margin-right:12px; object-fit:cover;"><span>${name} x${this.cart[n].qty}</span></div><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
+                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>${n.split('.')[0]} x${this.cart[n].qty}</span><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
                 }
                 this.subTotal = sub;
-                const total = sub - this.discount + this.paxiPrice;
-                document.getElementById('bag-count').innerText = 'R' + total;
-                document.getElementById('check-total').innerText = 'R' + total;
-                document.getElementById('checkout-list').innerHTML = html || 'Your bag is empty';
-            },
-
-            checkoutWA() {
-                let list = ""; for(let n in this.cart) { list += `- ${n.split('.')[0]} (x${this.cart[n].qty})\n`; }
-                const msg = `⚓ OTAKU BEADS ORDER\n\n${list}\nTotal: R${this.subTotal - this.discount + this.paxiPrice}`;
-                window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`, '_blank');
+                document.getElementById('bag-count').innerText = 'R' + sub;
+                document.getElementById('check-total').innerText = 'R' + sub;
+                document.getElementById('checkout-list').innerHTML = html || 'Empty';
             }
         };
         ENGINE.init();
