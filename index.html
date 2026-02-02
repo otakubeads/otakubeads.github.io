@@ -17,12 +17,12 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
         .card { background: var(--card); border-radius: 28px; border: 1px solid var(--out); overflow: hidden; }
         .btn-m3 { height: 48px; border-radius: 24px; border: none; font-weight: 700; background: var(--prim); color: var(--on-prim); width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .promo-banner { background: linear-gradient(135deg, #381E72, #6750A4); border: 1px solid var(--prim); padding: 24px; margin: 16px; border-radius: 28px; text-align: center; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: flex-end; }
         .sheet-overlay.active { display: flex; }
         .sheet-content { width: 100%; background: var(--sheet); border-radius: 32px 32px 0 0; height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
         .scroll-area { flex: 1; overflow-y: auto; padding: 24px; }
-        .paxi-section { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
-        .paxi-card { background: var(--surf); padding: 16px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .paxi-card { background: var(--surf); padding: 16px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .paxi-card.active { border-color: var(--prim); background: rgba(208,188,255,0.08); }
         .sticky-footer { padding: 20px 24px; background: #1C1921; border-top: 1px solid var(--out); }
     </style>
@@ -35,6 +35,13 @@
         </div>
         <div id="g_id_btn"></div>
     </header>
+
+    <div id="promo-area" class="promo-banner">
+        <h3 style="margin:0 0 8px 0; color:var(--prim);">Welcome Gift: 30% OFF</h3>
+        <p style="margin:0 0 20px 0; font-size:14px; opacity:0.9;">Claim your one-time discount code!</p>
+        <button class="btn-m3" style="height:44px; width:200px; margin:0 auto;" onclick="ENGINE.claimPromo()">Claim Now</button>
+        <p style="margin-top:12px; font-size:11px; opacity:0.6;">One use per device. Enjoy!</p>
+    </div>
 
     <main id="store-grid" class="grid"></main>
 
@@ -50,24 +57,24 @@
             </div>
             <div class="scroll-area">
                 <div id="checkout-list"></div>
-                <div class="paxi-section">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim);">DELIVERY OPTIONS</p>
+                <div style="margin-top:24px;">
+                    <p style="font-size:12px; font-weight:700; color:var(--prim);">DELIVERY</p>
                     <div id="paxi-0" class="paxi-card active" onclick="ENGINE.setPaxi(0, 'Collection')">
-                        <div><b>Store Collection</b><br><small>Cape Town</small></div><span>R0</span>
+                        <div><b>Store Collection</b><br><small>Cape Town</small></div><span>Free</span>
                     </div>
                     <div id="paxi-100" class="paxi-card" onclick="ENGINE.setPaxi(100, 'Express PAXI')">
                         <div><b>Express PAXI</b><br><small>3-5 Days</small></div><span>R100</span>
                     </div>
                 </div>
                 <div style="margin-top:24px; padding:20px; background:var(--surf); border-radius:24px;">
-                    <p style="font-size:12px; font-weight:700; color:var(--prim);">BURN-CODE</p>
-                    <input type="text" id="promo-box" style="width:100%; background:var(--bg); border:1px solid var(--out); color:white; padding:14px; border-radius:12px; box-sizing:border-box;" placeholder="Paste code..." oninput="ENGINE.validateCode(this.value)">
+                    <p style="font-size:12px; font-weight:700; color:var(--prim);">PROMO CODE</p>
+                    <input type="text" id="promo-box" style="width:100%; background:var(--bg); border:1px solid var(--out); color:white; padding:14px; border-radius:12px; box-sizing:border-box;" placeholder="Paste code here..." oninput="ENGINE.validateCode(this.value)">
                     <p id="promo-status" style="font-size:12px; margin-top:8px;"></p>
                 </div>
             </div>
             <div class="sticky-footer">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <b>Total (ZAR)</b>
+                    <b>Total</b>
                     <b id="check-total" style="font-size:24px; color:var(--prim);">R0</b>
                 </div>
                 <div id="gpay-container"></div>
@@ -82,21 +89,18 @@
         };
 
         const ENGINE = {
-            cart: {}, subTotal: 0, discount: 0, paxiPrice: 0, paxiName: 'Collection',
-            items: ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"],
+            cart: {}, subTotal: 0, discount: 0, paxiPrice: 0,
+            code: "BEADS-" + Math.random().toString(36).substr(2, 5).toUpperCase(),
             
             init() {
                 this.setupGoogle();
-                this.setupGPay();
-                this.renderStore();
-            },
-
-            renderStore() {
-                document.getElementById('store-grid').innerHTML = this.items.map(f => {
+                const items = ["Akane_keychain.jpg", "Ryomen_keychain.jpg", "Bulma_bracelet.jpg", "Usopp.jpg", "Chi-Chi_bracelet.jpg", "Vegeta_bracelet.jpg", "Dengi_keychain.jpg", "Yuta_keychain.jpg", "Gojo_keychain.jpg", "Zoro_bracelet.jpg", "Goku_bracelet.jpg", "Inosuke_keychain.jpg", "Kento_keychain.jpg", "Luffy_bracelet.jpg", "Nami_bracelet.jpg", "Nezuko_keychain.jpg", "Pwr_Moewy_keychain.jpg", "Ranma_keychain.jpg", "Ryoga_keychain.jpg"];
+                document.getElementById('store-grid').innerHTML = items.map(f => {
                     const p = f.toLowerCase().includes('keychain') ? 50 : 40;
                     const n = f.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : f.split('.')[0].replace(/[_-]/g, ' ');
                     return `<div class="card"><img src="${f}" style="width:100%; aspect-ratio:1/1; object-fit:cover;" onerror="this.src='logo.jpg'"><div style="padding:16px;"><b>${n}</b><br><span>R${p}</span><button class="btn-m3" style="margin-top:12px; height:36px;" onclick="ENGINE.add('${f}',${p})">Add</button></div></div>`;
                 }).join('');
+                this.setupGPay();
             },
 
             setupGoogle() {
@@ -113,11 +117,39 @@
                 check();
             },
 
+            async claimPromo() {
+                const id = btoa(navigator.userAgent + screen.width);
+                const burned = JSON.parse(localStorage.getItem('burned_promo') || '[]');
+                if(burned.includes(id)) {
+                    alert("This device has already claimed a welcome gift!");
+                    return;
+                }
+                navigator.clipboard.writeText(this.code);
+                burned.push(id);
+                localStorage.setItem('burned_promo', JSON.stringify(burned));
+                alert("Copied! Use code " + this.code + " at checkout for 30% off.");
+                document.getElementById('promo-area').innerHTML = `<h3 style="color:var(--prim);">Gift Claimed!</h3><p>Use your code before checking out.</p>`;
+            },
+
+            validateCode(val) {
+                const status = document.getElementById('promo-status');
+                if(val.trim().toUpperCase() === this.code) {
+                    this.discount = Math.floor(this.subTotal * 0.3);
+                    status.innerText = "30% Discount Applied!";
+                    status.style.color = "#81C784";
+                } else {
+                    this.discount = 0;
+                    status.innerText = "Invalid or expired code.";
+                    status.style.color = "var(--err)";
+                }
+                this.update();
+            },
+
             setupGPay() {
                 const check = () => {
                     if (typeof google === "undefined" || !google.payments) return setTimeout(check, 500);
-                    this.paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-                    const btn = this.paymentsClient.createButton({ onClick: () => this.checkoutWA(), buttonColor: 'black', buttonType: 'buy' });
+                    const client = new google.payments.api.PaymentsClient({environment: 'TEST'});
+                    const btn = client.createButton({ onClick: () => this.checkoutWA(), buttonColor: 'black', buttonType: 'buy' });
                     document.getElementById('gpay-container').innerHTML = '';
                     document.getElementById('gpay-container').appendChild(btn);
                 };
@@ -125,24 +157,25 @@
             },
 
             add(n, p) { if(!this.cart[n]) this.cart[n] = {p, qty:0}; this.cart[n].qty++; this.update(); },
-            setPaxi(p, n) { this.paxiPrice = p; this.paxiName = n; document.getElementById('paxi-0').classList.toggle('active', p===0); document.getElementById('paxi-100').classList.toggle('active', p===100); this.update(); },
+            setPaxi(p, n) { this.paxiPrice = p; document.getElementById('paxi-0').classList.toggle('active', p===0); document.getElementById('paxi-100').classList.toggle('active', p===100); this.update(); },
             
             update() {
                 let sub = 0; let html = '';
                 for(let n in this.cart) { 
-                    const name = n.split('.')[0].replace(/[_-]/g, ' ') === 'Usopp' ? 'Usopp bracelet' : n.split('.')[0].replace(/[_-]/g, ' ');
+                    const name = n.split('.')[0].replace(/[_-]/g, ' ');
                     sub += (this.cart[n].p * this.cart[n].qty);
                     html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;"><div style="display:flex; align-items:center;"><img src="${n}" style="width:40px; height:40px; border-radius:8px; margin-right:12px; object-fit:cover;"><span>${name} x${this.cart[n].qty}</span></div><span>R${this.cart[n].p * this.cart[n].qty}</span></div>`;
                 }
                 this.subTotal = sub;
-                document.getElementById('bag-count').innerText = 'R' + (sub - this.discount + this.paxiPrice);
-                document.getElementById('check-total').innerText = 'R' + (sub - this.discount + this.paxiPrice);
-                document.getElementById('checkout-list').innerHTML = html || 'Bag is empty';
+                const total = sub - this.discount + this.paxiPrice;
+                document.getElementById('bag-count').innerText = 'R' + total;
+                document.getElementById('check-total').innerText = 'R' + total;
+                document.getElementById('checkout-list').innerHTML = html || 'Your bag is empty';
             },
 
             checkoutWA() {
                 let list = ""; for(let n in this.cart) { list += `- ${n.split('.')[0]} (x${this.cart[n].qty})\n`; }
-                const msg = `⚓ OTAKU BEADS ORDER\n\n${list}\nDelivery: ${this.paxiName}\nTotal: R${this.subTotal - this.discount + this.paxiPrice}`;
+                const msg = `⚓ OTAKU BEADS ORDER\n\n${list}\nTotal: R${this.subTotal - this.discount + this.paxiPrice}`;
                 window.open(`https://wa.me/27663443753?text=${encodeURIComponent(msg)}`, '_blank');
             }
         };
